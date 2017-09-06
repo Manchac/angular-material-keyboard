@@ -43,7 +43,8 @@ function useKeyboardDirective($mdKeyboard, $timeout, $animate, $rootScope) {
             // open keyboard on focus
             element
                 .bind('focus', showKeyboard)
-                .bind('blur', hideKeyboard);
+                .bind('blur', hideKeyboard)
+                .bind('$destroy', hideKeyboard);
 
             function showKeyboard() {
                 if ($rootScope.keyboardTimeout) {
