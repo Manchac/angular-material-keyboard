@@ -4,37 +4,48 @@ $font-family: Roboto, 'Helvetica Neue', sans-serif !default;
 $baseline-grid: 8px !default;
 $z-index-keyboard: 110 !default;
 
-$swift-ease-out-duration: 0.4s !default;
-$swift-ease-out-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1) !default;
-$swift-ease-out: all $swift-ease-out-duration $swift-ease-out-timing-function !default;
-
-$swift-ease-in-duration: 0.3s !default;
-$swift-ease-in-timing-function: cubic-bezier(0.55, 0, 0.55, 0.2) !default;
-$swift-ease-in: all $swift-ease-in-duration $swift-ease-in-timing-function !default;
-
 // md-keyboard
-$keyboard-horizontal-padding: 2 * $baseline-grid !default;
-$keyboard-vertical-padding: 1 * $baseline-grid !default;
 $keyboard-icon-after-margin: 4 * $baseline-grid !default;
 $keyboard-list-item-height: 6 * $baseline-grid !default;
-$keyboard-hidden-bottom-padding: 80px !default;
 $keyboard-header-height: 7 * $baseline-grid !default;
 $keyboard-grid-font-weight: 400 !default;
+
+@keyframes keyboard-enter {
+    from {
+        opacity: 0;
+        transform: scaleY(0);
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
+
+@keyframes keyboard-leave {
+    from {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scaleY(0);
+    }
+}
 
 md-keyboard {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    padding: $keyboard-vertical-padding $keyboard-horizontal-padding $keyboard-vertical-padding + $keyboard-hidden-bottom-padding $keyboard-horizontal-padding;
     z-index: $z-index-keyboard;
 
     border-top-width: 1px;
     border-top-style: solid;
 
-    transform: translate3d(0, $keyboard-hidden-bottom-padding, 0);
-    transition: $swift-ease-out;
-    transition-property: transform;
+    opacity: 1;
+    transform-origin: 50% 100%;
 
     // should be provided by theme
     background-color: #FAFAFA;
@@ -44,21 +55,12 @@ md-keyboard {
         padding-top: 0;
     }
 
-    &.ng-enter {
-        opacity: 0;
-        transform: translate3d(0, 100%, 0);
+    &.fade.ng-enter {
+        animation: keyboard-enter 0.15s ease-in;
     }
 
-    &.ng-enter-active {
-        opacity: 1;
-        display: block;
-        transform: translate3d(0, $keyboard-hidden-bottom-padding, 0) !important;
-        transition: $swift-ease-out;
-    }
-
-    &.ng-leave-active {
-        transform: translate3d(0, 100%, 0) !important;
-        transition: $swift-ease-in;
+    &.fade.ng-leave {
+        animation: keyboard-leave 0.2s ease-in;
     }
 
     .md-subheader {
