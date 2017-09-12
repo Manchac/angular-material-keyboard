@@ -1,30 +1,37 @@
+@keyframes keyboard-enter {
+  from {
+    opacity: 0;
+    transform: scaleY(0); }
+  to {
+    opacity: 1;
+    transform: scaleY(1); } }
+
+@keyframes keyboard-leave {
+  from {
+    opacity: 1;
+    transform: scaleY(1); }
+  to {
+    opacity: 0;
+    transform: scaleY(0); } }
+
 md-keyboard {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 8px 16px 88px 16px;
   z-index: 110;
   border-top-width: 1px;
   border-top-style: solid;
-  transform: translate3d(0, 80px, 0);
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  transition-property: transform;
+  opacity: 1;
+  transform-origin: 50% 100%;
   background-color: #FAFAFA;
   border-top-color: #E0E0E0; }
   md-keyboard.md-has-header {
     padding-top: 0; }
-  md-keyboard.ng-enter {
-    opacity: 0;
-    transform: translate3d(0, 100%, 0); }
-  md-keyboard.ng-enter-active {
-    opacity: 1;
-    display: block;
-    transform: translate3d(0, 80px, 0) !important;
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
-  md-keyboard.ng-leave-active {
-    transform: translate3d(0, 100%, 0) !important;
-    transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2); }
+  md-keyboard.fade.ng-enter {
+    animation: keyboard-enter 0.15s ease-in; }
+  md-keyboard.fade.ng-leave {
+    animation: keyboard-leave 0.2s ease-in; }
   md-keyboard .md-subheader {
     background-color: transparent;
     font-family: Roboto, "Helvetica Neue", sans-serif;
