@@ -1,4 +1,4 @@
-<md-keyboard class="md-grid" layout="column" ng-cloak>
+<md-keyboard class="md-grid fade" layout="column" ng-cloak>
     <div ng-repeat="row in keyboard.keys" layout="row">
         <div flex ng-repeat="key in row" ng-switch="key[0]" ng-class="getKeyClass(key)">
             <span ng-switch-when="Bksp">
