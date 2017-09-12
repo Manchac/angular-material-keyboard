@@ -1,20 +1,32 @@
 {
-  "author": {
-    "email": "postdavidenke.de",
-    "name": "David Enke"
-  },
+  "contributors": [
+    "David Enke <postdavidenke.de> ()",
+    "Taylor Lanclos <tlanclos@live.com> ()"
+  ],
   "dependencies": {
-    "angular": "1.5.5",
-    "angular-animate": "1.5.5",
-    "angular-aria": "1.5.5",
-    "angular-material": "1.0.8",
-    "angular-messages": "1.5.5",
-    "angular-mocks": "1.5.5",
-    "angular-route": "1.5.5",
-    "angular-sanitize": "1.5.5",
-    "material-design-icons": "2.2.3"
+    "acorn": "~5.1.2",
+    "angular": "~1.5.5",
+    "angular-animate": "~1.5.5",
+    "angular-aria": "~1.5.5",
+    "angular-material": "~1.0.8",
+    "angular-messages": "~1.5.11",
+    "angular-mocks": "~1.5.11",
+    "angular-route": "~1.5.11",
+    "angular-sanitize": "~1.5.11",
+    "convert-source-map": "~1.5.0",
+    "css": "~2.2.1",
+    "debug-fabulous": "~0.1.1",
+    "detect-newline": "~2.1.0",
+    "graceful-fs": "~4.1.11",
+    "gulp": "^3.9.1",
+    "jshint-stylish": "^1.0.2",
+    "material-design-icons": "2.2.3",
+    "source-map": "~0.5.7",
+    "strip-bom": "~3.0.0",
+    "strip-bom-string": "~1.0.0",
+    "through2": "~2.0.3"
   },
-  "description": "Onscreen virtual keyboard for Angular (https://angularjs.org/) using Material (https://material.angularjs.org/)inspired by the Angular Virtual Keyboard by the-darc (https://github.com/the-darc/angular-virtual-keyboard).",
+  "description": "Onscreen virtual keyboard for Angular (https://angularjs.org/) using Material (https://material.angularjs.org/) inspired by the Angular Virtual Keyboard by the-darc (https://github.com/the-darc/angular-virtual-keyboard).",
   "devDependencies": {
     "bower": "^1.7.7",
     "conventional-changelog": "0.0.16",
@@ -50,17 +62,21 @@
     {
       "email": "postdavidenke.de",
       "name": "David Enke"
+    },
+    {
+      "email": "tlanclos@live.com",
+      "name": "Taylor Lanclos"
     }
   ],
   "name": "angular-material-keyboard",
   "optionalDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davidenke/angular-material-keyboard.git"
+    "url": "git+https://github.com/tlanclos/angular-material-keyboard.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "gulp build"
   },
-  "version": "0.0.10"
+  "version": "0.0.11"
 }
