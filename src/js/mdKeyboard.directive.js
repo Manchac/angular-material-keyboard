@@ -16,7 +16,7 @@ function MdKeyboardDirective($mdKeyboard) {
     };
 }
 
-function useKeyboardDirective($mdKeyboard, $timeout, $animate, $rootScope) {
+function useKeyboardDirective($mdKeyboard, $timeout, $interval, $animate, $rootScope) {
     return {
         restrict: 'A',
         require: '?ngModel',
@@ -28,6 +28,9 @@ function useKeyboardDirective($mdKeyboard, $timeout, $animate, $rootScope) {
 
             // bind instance to that var
             var keyboard;
+
+            // for scrolling
+            var interval;
 
             // Don't show virtual keyboard in mobile devices (default)
             var isMobile = false;
@@ -68,6 +71,18 @@ function useKeyboardDirective($mdKeyboard, $timeout, $animate, $rootScope) {
                 else {
                     $mdKeyboard.currentModel = ngModelCtrl;
                     $mdKeyboard.useLayout(attrs.useKeyboard);
+                }
+
+                $timeout(scroll, 0);
+
+                function scroll() {
+                    /* scroll to the element we just clicked on.
+                     * this assumes a sane scrollable region. Multiple
+                     * scrollable regions within each other are not supported
+                     * at this moment */
+                    /* TODO: support multiple nested scrollable regions */
+                    var scrollableElement = findFirstScrollableElement(element);
+                    scrollToElement(scrollableElement);
                 }
             }
 
@@ -227,12 +242,95 @@ function useKeyboardDirective($mdKeyboard, $timeout, $animate, $rootScope) {
             }
 
             function hideKeyboard() {
+                if (!isNullOrUndefined(interval)) {
+                    $interval.cancel(interval);
+                }
+
                 if ($rootScope.keyboardTimeout) {
                     $timeout.cancel($rootScope.keyboardTimeout);
                 }
                 $rootScope.keyboardTimeout = $timeout(function () {
                     $rootScope.keyboardAnimation = $mdKeyboard.hide();
                 }, 100);
+            }
+
+            function isNullOrUndefined(variable) {
+                return (variable === null) || angular.isUndefined(variable);
+            }
+
+            /**
+             * Find the first node whose parent node is scrollable.
+             * If no parent node is scrollable, then
+             * null is returned. If the passed in node is null or undefined,
+             * the result will also be null.
+             * ----------------------
+             * function based off StackOverflow answer
+             * https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
+             *
+             * @param node  lowest element in DOM to start search for scrollable element
+             */
+            function findFirstScrollableElement(node) {
+                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())) {
+                    return null;
+                }
+
+                var parentNode = node.parent();
+
+                /* check whether the height of the scrollable region on an element
+                 * is greater than the actual displayed region. This will tell us if
+                 * the element is scrollable */
+                if (parentNode[0].scrollHeight > parentNode[0].clientHeight) {
+                    return node;
+                } else {
+                    return findFirstScrollableElement(parentNode);
+                }
+            }
+
+            /**
+             * Scroll to a given element.
+             * This function assumes that the element is null (in which this function will do nothing)
+             * or an element whose parent is a scrollable region. To find this node, use
+             * findFirstScrollableElement.
+             *
+             * @param node  Node at which to scroll to
+             */
+            function scrollToElement(node) {
+                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())) {
+                    return;
+                }
+
+                /* cancel any ongoing animation interval */
+                if (!isNullOrUndefined(interval)) {
+                    $interval.cancel(interval);
+                }
+
+                /* grab our parent */
+                var parent = node.parent()[0];
+
+                /* scroll such that the top of our element is in the middle of the scrollable region */
+                var scrollToLocation = Math.max(0, Math.min(
+                    parent.scrollHeight,
+                    node[0].offsetTop - (parent.clientHeight / 2)
+                ));
+
+                /* keep track of our current location as a float (we cannot trust parent.scrollTop
+                 * because it is not a float and we will run into errors where scrolling may glitch)
+                 */
+                var currentLocation = parent.scrollTop;
+
+                /* start moving */
+                interval = $interval(moveStep, 10);
+                function moveStep() {
+                    var deltaScrollTo = scrollToLocation - currentLocation;
+
+                    /* 5px will not make that much of a difference */
+                    if (Math.abs(deltaScrollTo) <= 5) {
+                        $interval.cancel(interval);
+                    }
+
+                    currentLocation += deltaScrollTo * 0.15;
+                    parent.scrollTop = currentLocation;
+                }
             }
         }
     }
