@@ -15,6 +15,7 @@ function MdKeyboardProvider($$interimElementProvider,
     var SYMBOLS = keyboardSymbols;
     var NUMPAD = keyboardNumpad;
     var VISIBLE = false;
+    var KEYBOARD_SELECTOR = 'body';
 
     var $mdKeyboard = $$interimElementProvider('$mdKeyboard')
         .setDefaults({
@@ -25,6 +26,7 @@ function MdKeyboardProvider($$interimElementProvider,
         .addMethod('getCurrentLayout', getCurrentLayout)
         .addMethod('getLayouts', getLayouts)
         .addMethod('defaultLayout', defaultLayout)
+        .addMethod('keyboardSelector', keyboardSelector)
         .addMethod('useLayout', useLayout)
         .addMethod('addLayout', addLayout)
         .addMethod('isVisible', isVisible);
@@ -35,6 +37,7 @@ function MdKeyboardProvider($$interimElementProvider,
     $mdKeyboard.getCurrentLayout = getCurrentLayout;
     $mdKeyboard.getLayouts = getLayouts;
     $mdKeyboard.defaultLayout = defaultLayout;
+    $mdKeyboard.keyboardSelector = keyboardSelector;
     $mdKeyboard.useLayout = useLayout;
     $mdKeyboard.addLayout = addLayout;
     $mdKeyboard.isVisible = isVisible;
@@ -74,6 +77,11 @@ function MdKeyboardProvider($$interimElementProvider,
                 console.warn(msg);
             }
         }
+    }
+
+    // set parent
+    function keyboardSelector(selector) {
+        KEYBOARD_SELECTOR = selector
     }
 
     // set name of layout to use
@@ -135,28 +143,28 @@ function MdKeyboardProvider($$interimElementProvider,
         };
 
         function onShow(scope, element, options) {
-
             //if (options.clickOutsideToClose) {
             //    document.body.on('click', function () {
             //        $mdUtil.nextTick($mdKeyboard.cancel, true);
             //    });
             //}
 
-            var keyboard = new Keyboard(element, options.parent);
+            var parent = angular.element(document.querySelector(KEYBOARD_SELECTOR));
+            var keyboard = new Keyboard(element, parent);
             options.keyboard = keyboard;
-            options.parent.prepend(keyboard.element);
+            parent.append(keyboard.element);
 
             SCOPE = scope;
             VISIBLE = true;
 
-            $mdTheming.inherit(keyboard.element, options.parent);
+            $mdTheming.inherit(keyboard.element, parent);
 
             if (options.disableParentScroll) {
-                options.restoreScroll = $mdUtil.disableScrollAround(keyboard.element, options.parent);
+                options.restoreScroll = $mdUtil.disableScrollAround(keyboard.element, parent);
             }
 
             return $animate
-                .enter(keyboard.element, options.parent)
+                .enter(keyboard.element, parent)
                 .then(function () {
                     if (options.escapeToClose) {
                         options.rootElementKeyupCallback = function (e) {
@@ -191,22 +199,22 @@ function MdKeyboardProvider($$interimElementProvider,
          * Keyboard class to apply keyboard behavior to an element
          */
         function Keyboard(element, parent) {
-            var deregister = $mdGesture.register(parent, 'drag', {horizontal: false});
+            // var deregister = $mdGesture.register(parent, 'drag', {horizontal: false});
 
             element
                 .on('mousedown', onMouseDown);
-            parent
-                .on('$md.dragstart', onDragStart)
-                .on('$md.drag', onDrag)
-                .on('$md.dragend', onDragEnd);
+            // parent
+            //     .on('$md.dragstart', onDragStart)
+            //     .on('$md.drag', onDrag)
+            //     .on('$md.dragend', onDragEnd);
 
             return {
                 element: element,
                 cleanup: function cleanup() {
-                    deregister();
-                    parent.off('$md.dragstart', onDragStart);
-                    parent.off('$md.drag', onDrag);
-                    parent.off('$md.dragend', onDragEnd);
+                    // deregister();
+                    // parent.off('$md.dragstart', onDragStart);
+                    // parent.off('$md.drag', onDrag);
+                    // parent.off('$md.dragend', onDragEnd);
                     parent.triggerHandler('focus');
                 }
             };
@@ -215,33 +223,33 @@ function MdKeyboardProvider($$interimElementProvider,
                 ev.preventDefault();
             }
 
-            function onDragStart(ev) {
-                // Disable transitions on transform so that it feels fast
-                element.css($mdConstant.CSS.TRANSITION_DURATION, '0ms');
-            }
-
-            function onDrag(ev) {
-                var transform = ev.pointer.distanceY;
-                if (transform < 5) {
-                    // Slow down drag when trying to drag up, and stop after PADDING
-                    transform = Math.max(-PADDING, transform / 2);
-                }
-                element.css($mdConstant.CSS.TRANSFORM, 'translate3d(0,' + (PADDING + transform) + 'px,0)');
-            }
-
-            function onDragEnd(ev) {
-                if (ev.pointer.distanceY > 0 &&
-                    (ev.pointer.distanceY > 20 || Math.abs(ev.pointer.velocityY) > CLOSING_VELOCITY)) {
-                    var distanceRemaining = element.prop('offsetHeight') - ev.pointer.distanceY;
-                    var transitionDuration = Math.min(distanceRemaining / ev.pointer.velocityY * 0.75, 500);
-                    element.css($mdConstant.CSS.TRANSITION_DURATION, transitionDuration + 'ms');
-                    $mdUtil.nextTick($mdKeyboard.cancel, true);
-                    $window.document.activeElement.blur();
-                } else {
-                    element.css($mdConstant.CSS.TRANSITION_DURATION, '');
-                    element.css($mdConstant.CSS.TRANSFORM, '');
-                }
-            }
+            // function onDragStart(ev) {
+            //     // Disable transitions on transform so that it feels fast
+            //     element.css($mdConstant.CSS.TRANSITION_DURATION, '0ms');
+            // }
+            //
+            // function onDrag(ev) {
+            //     var transform = ev.pointer.distanceY;
+            //     if (transform < 5) {
+            //         // Slow down drag when trying to drag up, and stop after PADDING
+            //         transform = Math.max(-PADDING, transform / 2);
+            //     }
+            //     element.css($mdConstant.CSS.TRANSFORM, 'translate3d(0,' + (PADDING + transform) + 'px,0)');
+            // }
+            //
+            // function onDragEnd(ev) {
+            //     if (ev.pointer.distanceY > 0 &&
+            //         (ev.pointer.distanceY > 20 || Math.abs(ev.pointer.velocityY) > CLOSING_VELOCITY)) {
+            //         var distanceRemaining = element.prop('offsetHeight') - ev.pointer.distanceY;
+            //         var transitionDuration = Math.min(distanceRemaining / ev.pointer.velocityY * 0.75, 500);
+            //         element.css($mdConstant.CSS.TRANSITION_DURATION, transitionDuration + 'ms');
+            //         $mdUtil.nextTick($mdKeyboard.cancel, true);
+            //         $window.document.activeElement.blur();
+            //     } else {
+            //         element.css($mdConstant.CSS.TRANSITION_DURATION, '');
+            //         element.css($mdConstant.CSS.TRANSFORM, '');
+            //     }
+            // }
         }
     }
 }
