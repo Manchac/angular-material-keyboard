@@ -4,6 +4,8 @@ angular
 
 function MdKeyboardProvider($$interimElementProvider,
                             keyboardLayouts, keyboardDeadkey, keyboardSymbols, keyboardNumpad) {
+    var keyboardShowingClassName = 'md-keyboard-is-showing';
+
     // how fast we need to flick down to close the sheet, pixels/ms
     var SCOPE;
     var CLOSING_VELOCITY = 0.5;
@@ -154,6 +156,9 @@ function MdKeyboardProvider($$interimElementProvider,
             options.keyboard = keyboard;
             parent.append(keyboard.element);
 
+            // add keyboard class name to body
+            angular.element(document.body).addClass(keyboardShowingClassName);
+
             SCOPE = scope;
             VISIBLE = true;
 
@@ -192,6 +197,9 @@ function MdKeyboardProvider($$interimElementProvider,
                     }
 
                     keyboard.cleanup();
+
+                    // remove keyboard showing class from body
+                    angular.element(document.body).removeClass(keyboardShowingClassName);
                 });
         }
 
