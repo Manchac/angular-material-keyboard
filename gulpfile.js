@@ -38,13 +38,6 @@ gulp.task('build', function () {
         ' * The changelog below is from the original repo and does not reflect the changes ',
         ' * that have been made since then.',
         ' */',
-        '(function (angular) {',
-        '',
-        ''
-    ].join('\n');
-    var footer = [
-        '',
-        '})(angular);',
         ''
     ].join('\n');
 
@@ -79,7 +72,6 @@ gulp.task('build', function () {
             ])
             .pipe(plugins.concat('mdKeyboard.js'))
             .pipe(plugins.header(header, {pkg: pkg}))
-            .pipe(plugins.footer(footer))
             .pipe(plugins.embedTemplates())
             .pipe(plugins.replace(/[\r\n]+\s*\/\/.*TODO:+.*/gi, ''))
             .pipe(plugins.ngAnnotate())
