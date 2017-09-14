@@ -23,57 +23,81 @@ gulp.task('jshint', function (done) {
 });
 
 gulp.task('build', function () {
-    var pkg = require('./bower.json');
-
-    var header = ['/**',
+    var pkg = require('./package.json');
+    var header = [
+        '/**',
         ' * <%= pkg.name %>',
         ' * <%= pkg.description %>',
         ' * @version v<%= pkg.version %>',
         ' * @author <%= pkg.author %>',
         ' * @link <%= pkg.homepage %>',
         ' * @license <%= pkg.license %>',
+        ' *',
+        ' * NOTE: This project was originally forked from https://github.com/davidenke/angular-material-keyboard.',
+        ' * Additional changes have been made since the last official release on the original repo. ',
+        ' * The changelog below is from the original repo and does not reflect the changes ',
+        ' * that have been made since then.',
         ' */',
         '(function (angular) {',
         '',
-        ''].join('\n');
-
+        ''
+    ].join('\n');
     var footer = [
         '',
         '})(angular);',
-        ''].join('\n');
+        ''
+    ].join('\n');
 
-    gulp
-        .src([
-            'src/js/mdKeyboard.module.js',
-            'src/js/mdKeyboard.config.icons.js',
-            'src/js/mdKeyboard.config.layouts.js',
-            'src/js/mdKeyboard.config.deadkey.js',
-            'src/js/mdKeyboard.config.numpad.js',
-            'src/js/mdKeyboard.config.symbols.js',
-            'src/js/mdKeyboard.decorator.js',
-            'src/js/mdKeyboard.provider.js',
-            'src/js/mdKeyboard.directive.js'
-        ])
-        .pipe(plugins.concat('mdKeyboard.js'))
-        .pipe(plugins.header(header, {pkg: pkg}))
-        .pipe(plugins.footer(footer))
-        .pipe(plugins.embedTemplates())
-        .pipe(plugins.replace(/[\r\n]+\s*\/\/.*TODO:+.*/gi, ''))
-        .pipe(plugins.ngAnnotate())
-        .pipe(gulp.dest('./dist/'))
-        .pipe(plugins.uglify({mangle: false}))
-        .pipe(plugins.concat('mdKeyboard.min.js'))
-        .pipe(gulp.dest('./dist/'));
+    patchPackageJSON();
+    build();
 
-    gulp
-        .src('src/css/*.scss')
-        .pipe(plugins.sass().on('error', plugins.sass.logError))
-        .pipe(gulp.dest('./dist/'))
-        .pipe(plugins.concat('mdKeyboard.min.css'))
-        .pipe(plugins.sourcemaps.init())
-        .pipe(plugins.cleanCss())
-        .pipe(plugins.sourcemaps.write())
-        .pipe(gulp.dest('./dist/'));
+    function patchPackageJSON () {
+        var authors = [];
+        for (var maintainerIndex in pkg.maintainers) {
+            if (!pkg.maintainers.hasOwnProperty(maintainerIndex)) {
+                continue;
+            }
+
+            var author = pkg.maintainers[maintainerIndex];
+            authors.push(author.name + ' <' + author.email + '>')
+        }
+        pkg.author = authors.join('; ')
+    }
+
+    function build () {
+        gulp
+            .src([
+                'src/js/mdKeyboard.module.js',
+                'src/js/mdKeyboard.config.icons.js',
+                'src/js/mdKeyboard.config.layouts.js',
+                'src/js/mdKeyboard.config.deadkey.js',
+                'src/js/mdKeyboard.config.numpad.js',
+                'src/js/mdKeyboard.config.symbols.js',
+                'src/js/mdKeyboard.decorator.js',
+                'src/js/mdKeyboard.provider.js',
+                'src/js/mdKeyboard.directive.js'
+            ])
+            .pipe(plugins.concat('mdKeyboard.js'))
+            .pipe(plugins.header(header, {pkg: pkg}))
+            .pipe(plugins.footer(footer))
+            .pipe(plugins.embedTemplates())
+            .pipe(plugins.replace(/[\r\n]+\s*\/\/.*TODO:+.*/gi, ''))
+            .pipe(plugins.ngAnnotate())
+            .pipe(gulp.dest('./dist/'))
+            .pipe(plugins.uglify({mangle: false}))
+            .pipe(plugins.concat('mdKeyboard.min.js'))
+            .pipe(gulp.dest('./dist/'));
+
+        gulp
+            .src('src/css/*.scss')
+            .pipe(plugins.sass().on('error', plugins.sass.logError))
+            .pipe(gulp.dest('./dist/'))
+            .pipe(plugins.concat('mdKeyboard.min.css'))
+            .pipe(plugins.sourcemaps.init())
+            .pipe(plugins.cleanCss())
+            .pipe(plugins.sourcemaps.write())
+            .pipe(gulp.dest('./dist/'));
+    }
 });
 
 gulp.task('default', ['jshint', 'build'], function () {
@@ -81,7 +105,7 @@ gulp.task('default', ['jshint', 'build'], function () {
 });
 
 gulp.task('changelog', function (done) {
-    var pkg = require('./bower.json');
+    var pkg = require('./package.json');
     var changelog = require('conventional-changelog');
     var fs = require('fs');
 

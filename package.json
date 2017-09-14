@@ -46,7 +46,7 @@
     "jshint-stylish": "^1.0.0"
   },
   "directories": {},
-  "homepage": "https://github.com/davidenke/angular-material-keyboard",
+  "homepage": "https://github.com/tlanclos/angular-material-keyboard",
   "keywords": [
     "Angular",
     "Material",
