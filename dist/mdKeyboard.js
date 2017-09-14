@@ -11,10 +11,6 @@
  * The changelog below is from the original repo and does not reflect the changes 
  * that have been made since then.
  */
-(function (angular) {
-
-'use strict';
-
 /* See http://www.greywyvern.com/code/javascript/keyboard for examples
  * and usage instructions.
  *
@@ -61,23 +57,26 @@
  *
  */
 
-MdAutocompleteDecorator.$inject = ["$provide"];
-MdKeyboardProvider.$inject = ["$$interimElementProvider", "keyboardLayouts", "keyboardDeadkey", "keyboardSymbols", "keyboardNumpad"];
-MdKeyboardDirective.$inject = ["$mdKeyboard"];
-useKeyboardDirective.$inject = ["$mdKeyboard", "$timeout", "$interval", "$animate", "$rootScope"];
-angular
-    .module('material.components.keyboard', [
+(function () {
+    "use strict";
+
+    angular.module('material.components.keyboard', [
         'material.core',
         'material.components.icon'
     ]);
+})();
 
-angular
-    .module('material.components.keyboard')
-    .config(["$mdIconProvider", function ($mdIconProvider) {
-        $mdIconProvider
-            .fontSet('md', 'material-icons');
-    }]);
+(function () {
+    "use strict";
 
+    configure.$inject = ["$mdIconProvider"];
+    angular.module('material.components.keyboard')
+        .config(configure);
+
+    function configure ($mdIconProvider) {
+        $mdIconProvider.fontSet('md', 'material-icons');
+    }
+})();
 
 /* See http://www.greywyvern.com/code/javascript/keyboard for examples
  * and usage instructions.
@@ -125,9 +124,13 @@ angular
  *
  */
 
-angular
-    .module('material.components.keyboard')
-    .constant('keyboardLayouts', (function () {
+(function () {
+    "use strict";
+
+    angular.module('material.components.keyboard')
+        .constant('keyboardLayouts', keyboardLayouts());
+
+    function keyboardLayouts () {
         var layouts = {
             '\u0627\u0644\u0639\u0631\u0628\u064a\u0629': {
                 'name': 'Arabic', 'keys': [
@@ -2816,22 +2819,28 @@ angular
         };
 
         return layouts;
-    })());
+    }
+})();
 
-// - Lay out each dead key set as an object of property/value
-//   pairs.  The rows below are wrapped so uppercase letters are
-//   below their lowercase equivalents.
-//
-// - The property name is the letter pressed after the diacritic.
-//   The property value is the letter this key-combo will generate.
-//
-// - Note that if you have created a new keyboard layout and want
-//   it included in the distributed script, PLEASE TELL ME if you
-//   have added additional dead keys to the ones below.
+/* - Lay out each dead key set as an object of property/value
+ *   pairs.  The rows below are wrapped so uppercase letters are
+ *   below their lowercase equivalents.
+ *
+ * - The property name is the letter pressed after the diacritic.
+ *   The property value is the letter this key-combo will generate.
+ *
+ * - Note that if you have created a new keyboard layout and want
+ *   it included in the distributed script, PLEASE TELL ME if you
+ *   have added additional dead keys to the ones below.
+ */
 
-angular
-    .module('material.components.keyboard')
-    .constant('keyboardDeadkey', (function () {
+(function () {
+    "use strict";
+
+    angular.module('material.components.keyboard')
+        .constant('keyboardDeadkey', keyboardDeadkey());
+
+    function keyboardDeadkey() {
         var deadkey = {
             '"': {
                 'a': '\u00e4',
@@ -2899,15 +2908,18 @@ angular
                 '\u30d8': '\u30d9',
                 '\u30db': '\u30dc'
             },
-            '~': { // Tilde / Stroke
+            // Tilde / Stroke
+            '~': {
                 'a': '\u00e3', 'l': '\u0142', 'n': '\u00f1', 'o': '\u00f5',
                 'A': '\u00c3', 'L': '\u0141', 'N': '\u00d1', 'O': '\u00d5'
             },
-            '^': { // Circumflex
+            // Circumflex
+            '^': {
                 'a': '\u00e2', 'e': '\u00ea', 'i': '\u00ee', 'o': '\u00f4', 'u': '\u00fb', 'w': '\u0175', 'y': '\u0177',
                 'A': '\u00c2', 'E': '\u00ca', 'I': '\u00ce', 'O': '\u00d4', 'U': '\u00db', 'W': '\u0174', 'Y': '\u0176'
             },
-            '\u02c7': { // Baltic caron
+            // Baltic caron
+            '\u02c7': {
                 'c': '\u010D',
                 'd': '\u010f',
                 'e': '\u011b',
@@ -2931,11 +2943,13 @@ angular
                 'Z': '\u017D',
                 '\u00dc': '\u01d9'
             },
-            '\u02d8': { // Romanian and Turkish breve
+            // Romanian and Turkish breve
+            '\u02d8': {
                 'a': '\u0103', 'g': '\u011f',
                 'A': '\u0102', 'G': '\u011e'
             },
-            '-': { // Macron
+            // Macron
+            '-': {
                 'a': '\u0101',
                 'e': '\u0113',
                 'i': '\u012b',
@@ -2951,11 +2965,13 @@ angular
                 'Y': '\u0232',
                 '\u00dc': '\u01d5'
             },
-            '`': { // Grave
+            // Grave
+            '`': {
                 'a': '\u00e0', 'e': '\u00e8', 'i': '\u00ec', 'o': '\u00f2', 'u': '\u00f9', '\u00fc': '\u01dc',
                 'A': '\u00c0', 'E': '\u00c8', 'I': '\u00cc', 'O': '\u00d2', 'U': '\u00d9', '\u00dc': '\u01db'
             },
-            '\'': { // Acute / Greek Tonos
+            // Acute / Greek Tonos
+            '\'': {
                 'a': '\u00e1',
                 'e': '\u00e9',
                 'i': '\u00ed',
@@ -2985,41 +3001,52 @@ angular
                 '\u03a9': '\u038f',
                 '\u00dc': '\u01d7'
             },
-            '\u02dd': {// Hungarian Double Acute Accent
+            // Hungarian Double Acute Accent
+            '\u02dd': {
                 'o': '\u0151', 'u': '\u0171',
                 'O': '\u0150', 'U': '\u0170'
             },
-            '\u0385': { // Greek Dialytika + Tonos
+            // Greek Dialytika + Tonos
+            '\u0385': {
                 '\u03b9': '\u0390', '\u03c5': '\u03b0'
             },
-            '\u00b0': { // Ring
+            // Ring
+            '\u00b0': {
                 'a': '\u00e5', 'u': '\u016f',
                 'A': '\u00c5', 'U': '\u016e'
             },
-            '\u02DB': { // Ogonek
+            // Ogonek
+            '\u02DB': {
                 'a': '\u0106', 'e': '\u0119', 'i': '\u012f', 'o': '\u01eb', 'u': '\u0173', 'y': '\u0177',
                 'A': '\u0105', 'E': '\u0118', 'I': '\u012e', 'O': '\u01ea', 'U': '\u0172', 'Y': '\u0176'
             },
-            '\u02D9': { // Dot-above
+            // Dot-above
+            '\u02D9': {
                 'c': '\u010B', 'e': '\u0117', 'g': '\u0121', 'z': '\u017C',
                 'C': '\u010A', 'E': '\u0116', 'G': '\u0120', 'Z': '\u017B'
             },
-            '\u00B8':  { // Cedilla
+            // Cedilla
+            '\u00B8':  {
                 'c': '\u00e7', 's': '\u015F',
                 'C': '\u00c7', 'S': '\u015E'
             },
-            /*',': { // Comma
+            /*// / Comma
+            ',': {
              's': (this.VKI_isIElt8) ? '\u015F' : '\u0219', 't': (this.VKI_isIElt8) ? '\u0163' : '\u021B',
              'S': (this.VKI_isIElt8) ? '\u015E' : '\u0218', 'T': (this.VKI_isIElt8) ? '\u0162' : '\u021A'
              },*/
-            '\u3002': { // Hiragana/Katakana Point
+            // Hiragana/Katakana Point
+            '\u3002': {
                 '\u306f': '\u3071', '\u3072': '\u3074', '\u3075': '\u3077', '\u3078': '\u307a', '\u307b': '\u307d',
                 '\u30cf': '\u30d1', '\u30d2': '\u30d4', '\u30d5': '\u30d7', '\u30d8': '\u30da', '\u30db': '\u30dd'
             }
         };
 
-        // aliases
+        buildAliases(deadkey);
+        return deadkey;
+    }
 
+    function buildAliases (deadkey) {
         // Macron
         deadkey['\u00af'] = deadkey['-'];
 
@@ -3032,306 +3059,412 @@ angular
         // Ring
         deadkey['\u00ba'] = deadkey['\u00b0'];
         deadkey['\u201a'] = deadkey['\u00B8'];
+    }
+})();
 
-        return deadkey;
-    })());
+(function () {
+    "use strict";
 
-angular
-    .module('material.components.keyboard')
-    .constant('keyboardNumpad', [
-        [['$'], ['\u00a3'], ['\u20ac'], ['\u00a5']],
-        [['7'], ['8'], ['9'], ['/']],
-        [['4'], ['5'], ['6'], ['*']],
-        [['1'], ['2'], ['3'], ['-']],
-        [['0'], ['.'], ['='], ['+']]
-    ]);
+    angular.module('material.components.keyboard')
+        .constant('keyboardNumpad', keyboardNumpad());
 
-angular
-    .module('material.components.keyboard')
-    .constant('keyboardSymbols', {
-        '\u00a0': 'NB\nSP', '\u200b': 'ZW\nSP', '\u200c': 'ZW\nNJ', '\u200d': 'ZW\nJ'
-    });
+    function keyboardNumpad () {
+        return [
+            [['$'], ['\u00a3'], ['\u20ac'], ['\u00a5']],
+            [['7'], ['8'], ['9'], ['/']],
+            [['4'], ['5'], ['6'], ['*']],
+            [['1'], ['2'], ['3'], ['-']],
+            [['0'], ['.'], ['='], ['+']]
+        ];
+    }
+})();
 
-angular
-    .module('material.components.keyboard')
-    .config(MdAutocompleteDecorator);
+(function () {
+    "use strict";
 
-function MdAutocompleteDecorator($provide) {
-    // decorate md-autocomplete directive
-    // with use-keyboard behavior
-    $provide.decorator('mdAutocompleteDirective', ["$q", "$log", "$delegate", "$timeout", "$compile", "$mdUtil", "$mdConstant", function ($q, $log, $delegate, $timeout, $compile,
-                                                            $mdUtil, $mdConstant) {
-        var directive = $delegate[0];
-        var compile = directive.compile;
+    angular.module('material.components.keyboard')
+        .constant('keyboardSymbols', keyboardSymbols());
 
-        directive.compile = function () {
-            var link = compile.apply(this, arguments);
+    function keyboardSymbols () {
+        return {
+            '\u00a0': 'NB\nSP',
+            '\u200b': 'ZW\nSP',
+            '\u200c': 'ZW\nNJ',
+            '\u200d': 'ZW\nJ'
+        };
+    }
+})();
 
-            return function (scope, element, attrs, MdAutocompleteCtrl) {
-                // call original link
-                // function if existant
-                if (angular.isDefined(link)) {
-                    link.apply(this, arguments);
-                }
+(function () {
+    MdAutocompleteDecorator.$inject = ["$provide"];
+    angular.module('material.components.keyboard')
+        .config(MdAutocompleteDecorator);
 
-                if (angular.isDefined(attrs.useKeyboard)) {
-                    $timeout(function () {
-                        var input = angular.element(element[0].querySelector('input[type="search"]:not(use-keyboard)'));
-                        var cloned = input
-                            .clone(true, true)
-                            .attr('use-keyboard', attrs.useKeyboard);
-                        var compiled = $compile(cloned)(scope);
-                        input.replaceWith(compiled);
-                        var keydown = MdAutocompleteCtrl.keydown;
+    function MdAutocompleteDecorator($provide) {
+        // decorate md-autocomplete directive
+        // with use-keyboard behavior
+        mdAutocompleteDirective.$inject = ["$q", "$delegate", "$timeout", "$compile", "$mdUtil", "$mdConstant"];
+        $provide.decorator('mdAutocompleteDirective', mdAutocompleteDirective);
 
-                        function select (index) {
-                            $mdUtil.nextTick(function () {
-                                getDisplayValue(MdAutocompleteCtrl.matches[index]).then(function (val) {
-                                    var ngModel = compiled.controller('ngModel');
-                                    ngModel.$setViewValue(val);
-                                    ngModel.$render();
-                                }).finally(function () {
-                                    scope.selectedItem = MdAutocompleteCtrl.matches[index];
-                                    MdAutocompleteCtrl.loading = false;
-                                    MdAutocompleteCtrl.hidden = true;
-                                });
-                            }, false);
+        function mdAutocompleteDirective ($q, $delegate, $timeout, $compile, $mdUtil, $mdConstant) {
+            var directive = $delegate[0];
+            var compile = directive.compile;
 
-                            function getDisplayValue(item) {
-                                return $q.when(getItemText(item) || item);
+            directive.compile = function () {
+                var link = compile.apply(this, arguments);
+                return decorator;
+
+                function decorator (scope, element, attrs, MdAutocompleteCtrl) {
+                    // call original link
+                    // function if existant
+                    if (angular.isDefined(link)) {
+                        link.apply(this, arguments);
+                    }
+
+                    if (angular.isDefined(attrs.useKeyboard)) {
+                        $timeout(function () {
+                            var input = angular.element(
+                                element[0].querySelector('input[type="search"]:not(use-keyboard)')
+                            );
+                            var cloned = input
+                                .clone(true, true)
+                                .attr('use-keyboard', attrs.useKeyboard);
+                            var compiled = $compile(cloned)(scope);
+                            var keydown = MdAutocompleteCtrl.keydown;
+
+                            input.replaceWith(compiled);
+
+                            MdAutocompleteCtrl.select = select;
+                            MdAutocompleteCtrl.keydown = keydownDecorated;
+
+                            function select (index) {
+                                $mdUtil.nextTick(function () {
+                                    getDisplayValue(MdAutocompleteCtrl.matches[index]).then(function (val) {
+                                        var ngModel = compiled.controller('ngModel');
+                                        ngModel.$setViewValue(val);
+                                        ngModel.$render();
+                                    }).finally(function () {
+                                        scope.selectedItem = MdAutocompleteCtrl.matches[index];
+                                        MdAutocompleteCtrl.loading = false;
+                                        MdAutocompleteCtrl.hidden = true;
+                                    });
+                                }, false);
+
+                                function getDisplayValue(item) {
+                                    return $q.when(getItemText(item) || item);
+                                }
+
+                                function getItemText(item) {
+                                    return (item && scope.itemText) ? scope.itemText(getItemAsNameVal(item)) : null;
+                                }
+
+                                function getItemAsNameVal(item) {
+                                    if (!item) return undefined;
+
+                                    var locals = {};
+                                    if (MdAutocompleteCtrl.itemName) locals[MdAutocompleteCtrl.itemName] = item;
+
+                                    return locals;
+                                }
                             }
 
-                            function getItemText(item) {
-                                return (item && scope.itemText) ? scope.itemText(getItemAsNameVal(item)) : null;
-                            }
-
-                            function getItemAsNameVal(item) {
-                                if (!item) return undefined;
-
-                                var locals = {};
-                                if (MdAutocompleteCtrl.itemName) locals[MdAutocompleteCtrl.itemName] = item;
-
-                                return locals;
-                            }
-                        }
-
-                        function keydownDecorated(event) {
-                            switch (event.keyCode) {
-
-                                case $mdConstant.KEY_CODE.ENTER:
-                                    if (MdAutocompleteCtrl.hidden
-                                        || MdAutocompleteCtrl.loading
-                                        || MdAutocompleteCtrl.index < 0
-                                        || MdAutocompleteCtrl.matches.length < 1) return;
-                                    if (hasSelection()) return;
-                                    event.stopPropagation();
-                                    event.preventDefault();
-                                    select(MdAutocompleteCtrl.index);
-                                    break;
-
-                                case $mdConstant.KEY_CODE.TAB:
-                                case $mdConstant.KEY_CODE.ESCAPE:
-                                    compiled.blur();
-                                    if (scope.searchText) {
+                            function keydownDecorated (event) {
+                                switch (event.keyCode) {
+                                    case $mdConstant.KEY_CODE.ENTER:
+                                        if (MdAutocompleteCtrl.hidden
+                                            || MdAutocompleteCtrl.loading
+                                            || MdAutocompleteCtrl.index < 0
+                                            || MdAutocompleteCtrl.matches.length < 1) return;
+                                        if (hasSelection()) return;
+                                        event.stopPropagation();
+                                        event.preventDefault();
+                                        select(MdAutocompleteCtrl.index);
+                                        break;
+                                    case $mdConstant.KEY_CODE.TAB:
+                                    case $mdConstant.KEY_CODE.ESCAPE:
+                                        compiled.blur();
+                                        if (scope.searchText) {
+                                            keydown.call(MdAutocompleteCtrl, event);
+                                        }
+                                        break;
+                                    default:
                                         keydown.call(MdAutocompleteCtrl, event);
-                                    }
-                                    break;
+                                        break;
+                                }
 
-                                default:
-                                    keydown.call(MdAutocompleteCtrl, event);
-                                    break;
+                                function hasSelection() {
+                                    return Boolean(MdAutocompleteCtrl.scope.selectedItem);
+                                }
                             }
-
-                            function hasSelection() {
-                                return MdAutocompleteCtrl.scope.selectedItem ? true : false;
-                            }
-                        }
-
-                        MdAutocompleteCtrl.select = select;
-                        MdAutocompleteCtrl.keydown = keydownDecorated;
-                    });
+                        });
+                    }
                 }
             };
-        };
 
-        return $delegate;
-    }]);
-}
-
-angular
-    .module('material.components.keyboard')
-    .provider('$mdKeyboard', MdKeyboardProvider);
-
-function MdKeyboardProvider($$interimElementProvider,
-                            keyboardLayouts, keyboardDeadkey, keyboardSymbols, keyboardNumpad) {
-    keyboardDefaults.$inject = ["$window", "$animate", "$rootElement", "$mdConstant", "$mdUtil", "$mdTheming", "$mdKeyboard", "$mdGesture"];
-    var keyboardShowingClassName = 'md-keyboard-is-showing';
-
-    // how fast we need to flick down to close the sheet, pixels/ms
-    var SCOPE;
-    var CLOSING_VELOCITY = 0.5;
-    var PADDING = 80; // same as css
-    var DEFAULT_LAYOUT = 'US International';
-    var CURRENT_LAYOUT = DEFAULT_LAYOUT;
-    var LAYOUTS = keyboardLayouts;
-    var DEADKEY = keyboardDeadkey;
-    var SYMBOLS = keyboardSymbols;
-    var NUMPAD = keyboardNumpad;
-    var VISIBLE = false;
-    var KEYBOARD_SELECTOR = 'body';
-
-    var $mdKeyboard = $$interimElementProvider('$mdKeyboard')
-        .setDefaults({
-            methods: ['themable', 'disableParentScroll', 'clickOutsideToClose', 'layout'],
-            options: keyboardDefaults
-        })
-        .addMethod('getLayout', getLayout)
-        .addMethod('getCurrentLayout', getCurrentLayout)
-        .addMethod('getLayouts', getLayouts)
-        .addMethod('defaultLayout', defaultLayout)
-        .addMethod('keyboardSelector', keyboardSelector)
-        .addMethod('useLayout', useLayout)
-        .addMethod('addLayout', addLayout)
-        .addMethod('isVisible', isVisible);
-
-    // should be available in provider (config phase) not only
-    // in service as defined in $$interimElementProvider
-    $mdKeyboard.getLayout = getLayout;
-    $mdKeyboard.getCurrentLayout = getCurrentLayout;
-    $mdKeyboard.getLayouts = getLayouts;
-    $mdKeyboard.defaultLayout = defaultLayout;
-    $mdKeyboard.keyboardSelector = keyboardSelector;
-    $mdKeyboard.useLayout = useLayout;
-    $mdKeyboard.addLayout = addLayout;
-    $mdKeyboard.isVisible = isVisible;
-
-    // get currently used layout object
-    function getCurrentLayout() {
-        return CURRENT_LAYOUT;
-    }
-
-    // get currently used layout object
-    function getLayout(layout) {
-        if (LAYOUTS[layout]) {
-            return LAYOUTS[layout];
+            return $delegate;
         }
     }
+});
 
-    // get names of available layouts
-    function getLayouts() {
-        var layouts = [];
-        angular.forEach(LAYOUTS, function (obj, layout) {
-            layouts.push(layout);
-        });
-        return layouts;
-    }
+(function () {
+    "use strict";
 
-    // set default layout
-    function defaultLayout(layout) {
-        if (LAYOUTS[layout]) {
-            DEFAULT_LAYOUT = layout;
-            CURRENT_LAYOUT = layout;
-        } else {
-            if (layout.length) {
-                var msg = "" +
-                    "The keyboard layout '" + layout + "' does not exists. \n" +
-                    "The default layout \"" + DEFAULT_LAYOUT + "\" will be used.\n" +
-                    "To get a list of the available layouts use 'showLayouts'.";
-                console.warn(msg);
+    MdKeyboardProvider.$inject = ["$$interimElementProvider", "keyboardLayouts", "keyboardDeadkey", "keyboardSymbols", "keyboardNumpad"];
+    angular
+        .module('material.components.keyboard')
+        .provider('$mdKeyboard', MdKeyboardProvider);
+
+    function MdKeyboardProvider($$interimElementProvider, keyboardLayouts, keyboardDeadkey, keyboardSymbols, keyboardNumpad) {
+        keyboardDefaults.$inject = ["$animate", "$rootElement", "$mdConstant", "$mdUtil", "$mdTheming", "$mdKeyboard"];
+        var keyboardShowingClassName = 'md-keyboard-is-showing';
+        var currentScope = null;
+        var currentKeyboardLayout = 'US International';
+        var keyboardSelectorString = 'body';
+        var isKeyboardVisible = false;
+        var $mdKeyboard = $$interimElementProvider('$mdKeyboard')
+            .setDefaults({
+                methods: ['themable', 'disableParentScroll', 'clickOutsideToClose', 'layout'],
+                options: keyboardDefaults
+            })
+            .addMethod('getLayout', getLayout)
+            .addMethod('getCurrentLayout', getCurrentLayout)
+            .addMethod('getLayouts', getLayouts)
+            .addMethod('defaultLayout', defaultLayout)
+            .addMethod('keyboardSelector', keyboardSelector)
+            .addMethod('useLayout', useLayout)
+            .addMethod('addLayout', addLayout)
+            .addMethod('isVisible', isVisible);
+
+        /*
+         * should be available in provider (config phase) not only
+         * in service as defined in $$interimElementProvider
+         */
+        $mdKeyboard.getLayout = getLayout;
+        $mdKeyboard.getCurrentLayout = getCurrentLayout;
+        $mdKeyboard.getLayouts = getLayouts;
+        $mdKeyboard.defaultLayout = defaultLayout;
+        $mdKeyboard.keyboardSelector = keyboardSelector;
+        $mdKeyboard.useLayout = useLayout;
+        $mdKeyboard.addLayout = addLayout;
+        $mdKeyboard.isVisible = isVisible;
+
+        return $mdKeyboard;
+
+        /**
+         * Decide whether or not a value is null or undefined or neither.
+         *
+         * @param value value to check for null or undefined.
+         * @returns {boolean} true if element is null or undefined, false otherwise.
+         */
+        function isNullOrUndefined (value) {
+            return (value === null) || angular.isUndefined(value);
+        }
+
+        /**
+         * Get currently used layout object.
+         */
+        function getCurrentLayout () {
+            return currentKeyboardLayout;
+        }
+
+        /**
+         * Get a keyboard layout by name.
+         * @param layoutName layout name to query for.
+         * @returns {*} layout object associated with layoutName.
+         */
+        function getLayout (layoutName) {
+            if (keyboardLayouts.hasOwnProperty(layoutName) && !isNullOrUndefined(keyboardLayouts[layoutName])) {
+                return keyboardLayouts[layoutName];
             }
         }
-    }
 
-    // set parent
-    function keyboardSelector(selector) {
-        KEYBOARD_SELECTOR = selector
-    }
+        /**
+         * Get list of currently available layout names.
+         *
+         * @returns {Array} array of available layout names.
+         */
+        function getLayouts () {
+            var layouts = [];
+            angular.forEach(keyboardLayouts, function (_, layoutName) {
+                layouts.push(layoutName);
+            });
+            return layouts;
+        }
 
-    // set name of layout to use
-    function useLayout(layout) {
-        if (layout && LAYOUTS[layout]) {
-            CURRENT_LAYOUT = layout;
-        } else {
-            CURRENT_LAYOUT = DEFAULT_LAYOUT;
-            if (layout.length) {
-                var msg = "" +
-                    "The keyboard layout '" + layout + "' does not exists. \n" +
-                    "The default layout \"" + DEFAULT_LAYOUT + "\" will be used.\n" +
-                    "To get a list of the available layouts use 'showLayouts'.";
-                console.warn(msg);
+        /**
+         * Set default layout associated with name.
+         *
+         * @param layoutName layout name to set
+         */
+        function defaultLayout(layoutName) {
+            if (keyboardLayouts.hasOwnProperty(layoutName) && !isNullOrUndefined(keyboardLayouts[layoutName])) {
+                currentKeyboardLayout = layoutName;
+            } else {
+                if (!isNullOrUndefined(layoutName)) {
+                    console.warn([
+                        'The keyboard layout ' + layoutName + ' does not exist.',
+                        'The currently used layout is ' + getCurrentLayout() + '.',
+                        'To get a list of available layouts, use "showLayouts".'
+                    ].join('\n'));
+                }
             }
         }
-        // broadcast new layout
-        if (SCOPE) {
-            SCOPE.$broadcast('$mdKeyboardLayoutChanged', CURRENT_LAYOUT);
+
+        /**
+         * Set layout parent selector. This will allow the keyboard to be
+         * placed anywhere in the DOM that the user specifies.
+         *
+         * @param selector selector string to query for keyboard location.
+         */
+        function keyboardSelector(selector) {
+            keyboardSelectorString = selector
         }
-    }
 
-    // add a custom layout
-    function addLayout(layout, keys) {
-        if (!layout) return;
-        if (!LAYOUTS[layout]) {
-            LAYOUTS[layout] = keys;
-        } else {
-            var msg = "" +
-                "The keyboard layout '" + layout + "' already exists. \n" +
-                "Please use a different name.";
-            console.warn(msg);
-        }
-    }
-
-    // return if keyboard is visible
-    function isVisible() {
-        return VISIBLE;
-    }
-
-    return $mdKeyboard;
-
-    /* @ngInject */
-    function keyboardDefaults($window, $animate, $rootElement,
-                              $mdConstant, $mdUtil, $mdTheming, $mdKeyboard, $mdGesture) {
-
-        return {
-            onShow: onShow,
-            onRemove: onRemove,
-
-            themable: true,
-            disableParentScroll: true,
-            clickOutsideToClose: true,
-            layout: CURRENT_LAYOUT,
-            layouts: LAYOUTS,
-            deadkey: DEADKEY,
-            symbols: SYMBOLS,
-            numpad: NUMPAD
-        };
-
-        function onShow(scope, element, options) {
-            //if (options.clickOutsideToClose) {
-            //    document.body.on('click', function () {
-            //        $mdUtil.nextTick($mdKeyboard.cancel, true);
-            //    });
-            //}
-
-            var parent = angular.element(document.querySelector(KEYBOARD_SELECTOR));
-            var keyboard = new Keyboard(element, parent);
-            options.keyboard = keyboard;
-            parent.append(keyboard.element);
-
-            // add keyboard class name to body
-            angular.element(document.body).addClass(keyboardShowingClassName);
-
-            SCOPE = scope;
-            VISIBLE = true;
-
-            $mdTheming.inherit(keyboard.element, parent);
-
-            if (options.disableParentScroll) {
-                options.restoreScroll = $mdUtil.disableScrollAround(keyboard.element, parent);
+        /**
+         * Set the name of the layout to use.
+         *
+         * @param layoutName name of layout to use.
+         */
+        function useLayout(layoutName) {
+            if (keyboardLayouts.hasOwnProperty(layoutName) && !isNullOrUndefined(keyboardLayouts[layoutName])) {
+                currentKeyboardLayout = layoutName;
+            } else {
+                if (!isNullOrUndefined(layoutName)) {
+                    console.warn([
+                        'The keyboard layout ' + layoutName + ' does not exist.',
+                        'The currently used layout is ' + getCurrentLayout() + '.',
+                        'To get a list of available layouts, use "showLayouts".'
+                    ].join('\n'));
+                }
             }
 
-            return $animate
-                .enter(keyboard.element, parent)
-                .then(function () {
+            /* broadcast new layout */
+            broadcastNewLayout();
+        }
+
+        /**
+         * Add a custom layout.
+         *
+         * @param layoutName name of the layout.
+         * @param keys layout key configuration.
+         */
+        function addLayout(layoutName, keys) {
+            if (isNullOrUndefined(layoutName)) {
+                return;
+            }
+
+            if (!keyboardLayouts.hasOwnProperty(layoutName)) {
+                keyboardLayouts[layoutName] = keys;
+            } else {
+                console.warn('There is already a keyboard layout named ' + layoutName + ', use a different name.');
+            }
+        }
+
+        /**
+         * Broadcast to the current scope that a that the layout has been changed.
+         */
+        function broadcastNewLayout () {
+            if (!isNullOrUndefined(currentScope)) {
+                currentScope.$broadcast('$mdKeyboardLayoutChanged', currentKeyboardLayout);
+            }
+        }
+
+        /**
+         * Set the current scope.
+         *
+         * @param scope scope to set.
+         */
+        function setCurrentScope (scope) {
+            currentScope = scope;
+        }
+
+        /**
+         * Check whether or not the keyboard is visible.
+         *
+         * @returns {*} whether or not the keyboard is currently visible.
+         */
+        function isVisible () {
+            return isKeyboardVisible;
+        }
+
+        /**
+         * Set the keyboard status to showing or not showing based on the "showing" parameter.
+         *
+         * @param showing true if the keyboard status should be set to showing, false otherwise.
+         */
+        function setKeyboardShowing (showing) {
+            if (showing) {
+                angular.element(document.body).addClass(keyboardShowingClassName);
+            } else {
+                angular.element(document.body).removeClass(keyboardShowingClassName);
+            }
+
+            isKeyboardVisible = showing;
+        }
+
+        /**
+         * Get the keyboard parent (where to shove the keyboard element).
+         *
+         * @return {*} an angular element for the keyboard parent.
+         */
+        function getKeyboardParent () {
+            return angular.element(document.querySelector(keyboardSelectorString));
+        }
+
+        /* @ngInject */
+        function keyboardDefaults($animate, $rootElement, $mdConstant, $mdUtil, $mdTheming, $mdKeyboard) {
+            return {
+                onShow: onShow,
+                onRemove: onRemove,
+
+                themable: true,
+                disableParentScroll: true,
+                clickOutsideToClose: true,
+                layout: currentKeyboardLayout,
+                layouts: keyboardLayouts,
+                deadkey: keyboardDeadkey,
+                symbols: keyboardSymbols,
+                numpad: keyboardNumpad
+            };
+
+            /**
+             * Show our keyboard.
+             *
+             * @param scope keyboard scope.
+             * @param element element keyboard is applied to.
+             * @param options options for keyboard.
+             */
+            function onShow(scope, element, options) {
+                var parent = getKeyboardParent();
+                var keyboard = new Keyboard(element, parent);
+
+                /* make sure our parent is okay */
+                if (isNullOrUndefined(parent)) {
+                    return;
+                }
+
+                /* add keyboard to our options */
+                options.keyboard = keyboard;
+
+                /* set our status to showing and configure our current scope */
+                setKeyboardShowing(true);
+                setCurrentScope(scope);
+
+                /* add the keyboard to our chosen parent */
+                parent.append(keyboard.element);
+
+                $mdTheming.inherit(keyboard.element, parent);
+
+                if (options.disableParentScroll) {
+                    options.restoreScroll = $mdUtil.disableScrollAround(keyboard.element, parent);
+                }
+
+                /* start keyboard show animation */
+                return $animate
+                    .enter(keyboard.element, parent)
+                    .then(animationComplete);
+
+                function animationComplete () {
                     if (options.escapeToClose) {
                         options.rootElementKeyupCallback = function (e) {
                             if (e.keyCode === $mdConstant.KEY_CODE.ESCAPE) {
@@ -3340,221 +3473,448 @@ function MdKeyboardProvider($$interimElementProvider,
                         };
                         $rootElement.on('keyup', options.rootElementKeyupCallback);
                     }
-                });
+                }
+            }
 
-        }
+            /**
+             * Remove our keyboard.
+             *
+             * @param scope keyboard scope.
+             * @param element element keyboard is applied to.
+             * @param options options for keyboard.
+             */
+            function onRemove(scope, element, options) {
+                var keyboard = options.keyboard;
 
-        function onRemove(scope, element, options) {
-            var keyboard = options.keyboard;
+                /* start keyboard hide animation */
+                return $animate
+                    .leave(keyboard.element)
+                    .then(animationComplete);
 
-            return $animate
-                .leave(keyboard.element)
-                .then(function () {
-                    VISIBLE = false;
-
+                function animationComplete () {
                     if (options.disableParentScroll) {
                         options.restoreScroll();
                         delete options.restoreScroll;
                     }
 
+                    /* cleanup keyboard */
                     keyboard.cleanup();
 
-                    // remove keyboard showing class from body
-                    angular.element(document.body).removeClass(keyboardShowingClassName);
-                });
-        }
-
-        /**
-         * Keyboard class to apply keyboard behavior to an element
-         */
-        function Keyboard(element, parent) {
-            // var deregister = $mdGesture.register(parent, 'drag', {horizontal: false});
-
-            element
-                .on('mousedown', onMouseDown);
-            // parent
-            //     .on('$md.dragstart', onDragStart)
-            //     .on('$md.drag', onDrag)
-            //     .on('$md.dragend', onDragEnd);
-
-            return {
-                element: element,
-                cleanup: function cleanup() {
-                    // deregister();
-                    // parent.off('$md.dragstart', onDragStart);
-                    // parent.off('$md.drag', onDrag);
-                    // parent.off('$md.dragend', onDragEnd);
-                    parent.triggerHandler('focus');
+                    /* set our status to not showing and configure our current scope */
+                    setKeyboardShowing(false);
+                    setCurrentScope(null);
                 }
-            };
-
-            function onMouseDown(ev) {
-                ev.preventDefault();
             }
 
-            // function onDragStart(ev) {
-            //     // Disable transitions on transform so that it feels fast
-            //     element.css($mdConstant.CSS.TRANSITION_DURATION, '0ms');
-            // }
-            //
-            // function onDrag(ev) {
-            //     var transform = ev.pointer.distanceY;
-            //     if (transform < 5) {
-            //         // Slow down drag when trying to drag up, and stop after PADDING
-            //         transform = Math.max(-PADDING, transform / 2);
-            //     }
-            //     element.css($mdConstant.CSS.TRANSFORM, 'translate3d(0,' + (PADDING + transform) + 'px,0)');
-            // }
-            //
-            // function onDragEnd(ev) {
-            //     if (ev.pointer.distanceY > 0 &&
-            //         (ev.pointer.distanceY > 20 || Math.abs(ev.pointer.velocityY) > CLOSING_VELOCITY)) {
-            //         var distanceRemaining = element.prop('offsetHeight') - ev.pointer.distanceY;
-            //         var transitionDuration = Math.min(distanceRemaining / ev.pointer.velocityY * 0.75, 500);
-            //         element.css($mdConstant.CSS.TRANSITION_DURATION, transitionDuration + 'ms');
-            //         $mdUtil.nextTick($mdKeyboard.cancel, true);
-            //         $window.document.activeElement.blur();
-            //     } else {
-            //         element.css($mdConstant.CSS.TRANSITION_DURATION, '');
-            //         element.css($mdConstant.CSS.TRANSFORM, '');
-            //     }
-            // }
+            /**
+             * Keyboard class to apply keyboard behavior to an element
+             */
+            function Keyboard(element, parent) {
+                element.on('mousedown', onMouseDown);
+
+                return {
+                    element: element,
+                    cleanup: cleanup
+                };
+
+                /**
+                 * Event that will happen when the mouse is pressed on a key.
+                 *
+                 * @param ev mouse event
+                 */
+                function onMouseDown(ev) {
+                    ev.preventDefault();
+                }
+
+                /**
+                 * Keyboard cleanup.
+                 */
+                function cleanup () {
+                    parent.triggerHandler('focus');
+                }
+            }
         }
     }
-}
+})();
 
-angular
-    .module('material.components.keyboard')
-    .directive('mdKeyboard', MdKeyboardDirective)
-    .directive('useKeyboard', useKeyboardDirective);
+(function () {
+    "use strict";
 
-function MdKeyboardDirective($mdKeyboard) {
-    return {
-        restrict: 'E',
-        link: function postLink(scope) {
+    MdKeyboardDirective.$inject = ["$mdKeyboard"];
+    useKeyboardDirective.$inject = ["$mdKeyboard", "$timeout", "$interval", "$animate", "$rootScope"];
+    angular.module('material.components.keyboard')
+        .directive('mdKeyboard', MdKeyboardDirective)
+        .directive('useKeyboard', useKeyboardDirective);
+
+    function MdKeyboardDirective ($mdKeyboard) {
+        return {
+            restrict: 'E',
+            link: postLink
+        };
+
+        function postLink (scope) {
             // When navigation force destroys an interimElement, then
             // listen and $destroy() that interim instance...
             scope.$on('$destroy', function () {
                 $mdKeyboard.destroy();
             });
         }
-    };
-}
+    }
 
-function useKeyboardDirective($mdKeyboard, $timeout, $interval, $animate, $rootScope) {
-    return {
-        restrict: 'A',
-        require: '?ngModel',
-        link: function (scope, element, attrs, ngModelCtrl) {
-            // requires ngModel silently
+    function useKeyboardDirective($mdKeyboard, $timeout, $interval, $animate, $rootScope) {
+        return {
+            restrict: 'A',
+            require: '?ngModel',
+            link: postLink
+        };
+
+        function postLink (scope, element, attrs, ngModelCtrl) {
+            /* Don't show virtual keyboard in mobile devices (default) */
+            var isMobile = isMobileDevice();
+
+            /* for show and hide */
+            $rootScope.keyboardTimeout = null;
+            $rootScope.keyboardAnimation = null;
+            $rootScope.scrollAnimation = null;
+
+            /* requires ngModel silently */
             if (!ngModelCtrl) {
                 return;
             }
 
-            // bind instance to that var
-            var keyboard;
-
-            // for scrolling
-            var interval;
-
-            // Don't show virtual keyboard in mobile devices (default)
-            var isMobile = false;
-            (function (a) {
-                if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) {
-                    isMobile = true;
-                }
-            })(navigator.userAgent || navigator.vendor || window.opera);
+            /* do nothing if we are not supposed to show in mobile */
             if (isMobile && attrs.showInMobile !== true) {
                 return;
             }
 
-            // open keyboard on focus
+            /*
+             * open keyboard on focus
+             * hide keyboard on blur and $destroy
+             */
             element
                 .bind('focus', showKeyboard)
                 .bind('blur', hideKeyboard)
                 .bind('$destroy', hideKeyboard);
 
-            function showKeyboard() {
-                if ($rootScope.keyboardTimeout) {
-                    $timeout.cancel($rootScope.keyboardTimeout);
-                }
-                if ($rootScope.keyboardAnimation) {
-                    $animate.cancel($rootScope.keyboardAnimation);
-                }
+            /**
+             * Detect if the device being used is a mobile device or other device.
+             *
+             * This function is based on the answer by Tiesselune on StackOverflow:
+             * https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+             *
+             * @return Whether or not the current device is a mobile device.
+             */
+            function isMobileDevice () {
+                var a = navigator.userAgent || navigator.vendor || window.opera;
 
-                // no keyboard active, so add new
-                if (!$mdKeyboard.isVisible()) {
-                    $mdKeyboard.currentModel = ngModelCtrl;
-                    $rootScope.keyboardAnimation = $mdKeyboard.show({
-                        template:'<md-keyboard class="md-grid fade" layout="column" ng-cloak><div ng-repeat="row in keyboard.keys" layout="row"><div flex ng-repeat="key in row" ng-switch="key[0]" ng-class="getKeyClass(key)"><span ng-switch-when="Bksp"><md-button class="md-raised key-bksp" ng-mousedown="pressed($event, key[0])" aria-label="{{key[0] || \'key\'}}"><md-icon>keyboard_backspace</md-icon></md-button></span> <span ng-switch-when="Tab"><md-button class="md-raised key-tab" ng-mousedown="pressed($event, key[0])" aria-label="{{key[0] || \'key\'}}"><md-icon>keyboard_tab</md-icon></md-button></span> <span ng-switch-when="Caps"><md-button class="md-raised key-caps" ng-class="{\'locked\': capsLocked, \'md-focused\': capsLocked}" ng-mousedown="pressed($event, key[0])" aria-label="{{key[0] || \'key\'}}"><md-icon>keyboard_capslock</md-icon></md-button></span> <span ng-switch-when="Enter"><md-button class="md-raised key-enter" ng-mousedown="pressed($event, key[0])" aria-label="{{key[0] || \'key\'}}"><md-icon>keyboard_return</md-icon></md-button></span> <span ng-switch-when="Shift"><md-button class="md-raised key-shift" ng-mousedown="pressed($event, key[0])" aria-label="{{key[0] || \'key\'}}">{{key[0]}}</md-button></span> <span ng-switch-when="Spacer"></span> <span ng-switch-default><md-button class="md-raised key-char" ng-mousedown="pressed($event, key[!capsLocked && !caps ? 0 : 1] || key[0])" aria-label="{{key[!capsLocked && !caps ? 0 : 1] || \'key\'}}">{{key[!capsLocked && !caps ? 0 : 1] || key[0]}}</md-button></span></div></div></md-keyboard>',
-                        controller: mdKeyboardController,
-                        bindToController: true
-                    });
-                }
+                return /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)
+                    || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br[ev]w|bumb|bw-[nu]|c55\/|capi|ccwa|cdm-|cell|chtm|cldc|cmd-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc-s|devi|dica|dmob|do[cp]o|ds(12|-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly[-_]|g1 u|g560|gene|gf-5|g-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd-[mpt]|hei-|hi(pt|ta)|hp( i|ip)|hs-c|ht(c[-_agpst ]|tp)|hu(aw|tc)|i-(20|go|ma)|i230|iac[\-\/ ]|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja[tv]a|jbro|jemu|jigs|kddi|keji|kgt[\/ ]|klon|kpt |kwc-|kyo[ck]|le(no|xi)|lg( g|\/[klu]|50|54|-[a-w])|libw|lynx|m1-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t[-ov ]|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30[02]|n50[025]|n7(0[01]|10)|ne([cm]-|on|tf|wf|wg|wt)|nok[6i]|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan[adt]|pdxg|pg(13|-([1-8]|c))|phil|pire|pl(ay|uc)|pn-2|po(ck|rt|se)|prox|psio|pt-g|qa-a|qc(07|12|21|32|60|-[2-7]|i-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h-|oo|p-)|sdk\/|se(c[-01]|47|mc|nd|ri)|sgh-|shar|sie[-m]|sk-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h-|v-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl-|tdg-|tel[im]|tim-|t-mo|to(pl|sh)|ts(70|m-|m3|m5)|tx-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c[- ]|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas-|your|zeto|zte-/i.test(a.substr(0, 4));
+            }
 
-                // use existing keyboard
-                else {
-                    $mdKeyboard.currentModel = ngModelCtrl;
-                    $mdKeyboard.useLayout(attrs.useKeyboard);
-                }
+            /**
+             * Stop all ongoing animations that could possibly be occurring.
+             */
+            function stopAllAnimations () {
+                stopScrollAnimation();
+                stopKeyboardTimeout();
+                stopKeyboardAnimation();
+            }
 
-                $timeout(scroll, 0);
-
-                function scroll() {
-                    /* scroll to the element we just clicked on.
-                     * this assumes a sane scrollable region. Multiple
-                     * scrollable regions within each other are not supported
-                     * at this moment */
-                    /* TODO: support multiple nested scrollable regions */
-                    var scrollableElement = findFirstScrollableElement(element);
-                    scrollToElement(scrollableElement);
+            /**
+             * Stop scroll to element animation.
+             */
+            function stopScrollAnimation () {
+                /* stop scroll animation */
+                if (!isNullOrUndefined($rootScope.scrollAnimation)) {
+                    $interval.cancel($rootScope.scrollAnimation);
+                    $rootScope.scrollAnimation = null;
                 }
             }
 
-            function mdKeyboardController($scope) {
-                $mdKeyboard.useLayout(attrs.useKeyboard);
+            /**
+             * Stop keyboard hide timeout.
+             */
+            function stopKeyboardTimeout () {
+                /* stop keyboard timeout */
+                if (!isNullOrUndefined($rootScope.keyboardTimeout)) {
+                    $timeout.cancel($rootScope.keyboardTimeout);
+                    $rootScope.keyboardTimeout = null;
+                }
+            }
 
-                var getKeyClass = function (key) {
+            /**
+             * Stop keyboard show or hide animation.
+             */
+            function stopKeyboardAnimation () {
+                /* stop keyboard animation */
+                if (!isNullOrUndefined($rootScope.keyboardAnimation)) {
+                    $animate.cancel($rootScope.keyboardAnimation);
+                    $rootScope.keyboardAnimation = null;
+                }
+            }
+
+            /**
+             * Start keyboard show animation.
+             */
+            function startKeyboardShow () {
+                $rootScope.keyboardAnimation = $mdKeyboard.show({
+                    template:'<md-keyboard class="md-grid fade" layout="column" ng-cloak><div ng-repeat="row in keyboard.layout.keys" layout="row"><div flex ng-repeat="key in row" ng-switch="key[0]" ng-class="keyboard.getKeyClass(key)"><span ng-switch-when="Bksp"><md-button class="md-raised key-bksp" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_backspace</md-icon></md-button></span> <span ng-switch-when="Tab"><md-button class="md-raised key-tab" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_tab</md-icon></md-button></span> <span ng-switch-when="Caps"><md-button class="md-raised key-caps" ng-class="{\'locked\': keyboard.capsLocked, \'md-focused\': keyboard.capsLocked}" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_capslock</md-icon></md-button></span> <span ng-switch-when="Enter"><md-button class="md-raised key-enter" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_return</md-icon></md-button></span> <span ng-switch-when="Shift"><md-button class="md-raised key-shift" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}">{{ keyboard.getKey(key) }}</md-button></span> <span ng-switch-when="Spacer"></span> <span ng-switch-default><md-button class="md-raised key-char" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key, true) || keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key, true) || \'key\' }}">{{ keyboard.getKey(key, true) || keyboard.getKey(key) }}</md-button></span></div></div></md-keyboard>',
+                    controller: mdKeyboardController,
+                    controllerAs: 'keyboard',
+                    bindToController: true
+                });
+            }
+
+            /**
+             * Start keyboard hide animation.
+             */
+            function startKeyboardHide () {
+                $rootScope.keyboardTimeout = $timeout(function () {
+                    $rootScope.keyboardAnimation = $mdKeyboard.hide();
+                }, 100);
+            }
+
+            /**
+             * Start animating scrolling to an element.
+             *
+             * @param parent parent element to scroll
+             * @param scrollToLocation location to scroll to
+             */
+            function startScrollToAnimation (parent, scrollToLocation) {
+                /*
+                 * keep track of our current location as a float (we cannot trust parent.scrollTop
+                 * because it is not a float and we will run into errors where scrolling may glitch)
+                 */
+                var currentLocation = parent.scrollTop;
+
+                $rootScope.scrollAnimation = $interval(moveStep, 33);
+
+                /**
+                 * Move another step closer to the scroll to location.
+                 */
+                function moveStep () {
+                    var deltaScrollTo = scrollToLocation - currentLocation;
+
+                    /* Threshold of 5px will not make that much of a difference */
+                    if (Math.abs(deltaScrollTo) <= 5) {
+                        stopScrollAnimation();
+                    }
+
+                    currentLocation += deltaScrollTo * 0.15;
+                    parent.scrollTop = currentLocation;
+                }
+            }
+
+            /**
+             * Set keyboard layout to use.
+             *
+             * @param layoutName layout name to use.
+             */
+            function useKeyboardLayout (layoutName) {
+                /* only use the keyboard if it is defined */
+                if (!isNullOrUndefined(layoutName) && layoutName !== '') {
+                    /* switch which layout to use */
+                    $mdKeyboard.useLayout(layoutName);
+                }
+            }
+
+            /**
+             * Show the keyboard.
+             */
+            function showKeyboard() {
+                /* cancel all ongoing animations */
+                stopAllAnimations();
+
+                /*
+                 * decide whether to add a new keyboard or use
+                 * existing based on whether or not the keyboard
+                 * is already visible
+                 */
+                if (!$mdKeyboard.isVisible()) {
+                    /* no keyboard active, so add new */
+                    $mdKeyboard.currentModel = ngModelCtrl;
+                    startKeyboardShow();
+                } else {
+                    /* use existing keyboard */
+                    $mdKeyboard.currentModel = ngModelCtrl;
+                    useKeyboardLayout(attrs.useKeyboard);
+                }
+
+                /*
+                 * scroll to the element we just clicked on.
+                 * this assumes a sane scrollable region. Multiple
+                 * scrollable regions within each other are not supported
+                 * at this moment
+                 */
+                /* TODO: support multiple nested scrollable regions */
+                $timeout(function () {
+                    scrollToElement(findFirstScrollableElement(element));
+                }, 0);
+            }
+
+            /**
+             * Hide the keyboard.
+             */
+            function hideKeyboard() {
+                /* stop all ongoing animations */
+                stopAllAnimations();
+
+                /* keyboard hide timeout */
+                startKeyboardHide();
+            }
+
+            /**
+             * Decide whether or not a value is null or undefined or neither.
+             *
+             * @param value value to check for null or undefined.
+             * @returns {boolean} true if element is null or undefined, false otherwise.
+             */
+            function isNullOrUndefined(value) {
+                return (value === null) || angular.isUndefined(value);
+            }
+
+            /**
+             * Find the first node whose parent node is scrollable.
+             *
+             * If no parent node is scrollable, then
+             * null is returned. If the passed in node is null or undefined,
+             * the result will also be null.
+             *
+             * function based off answer by nils on StackOverflow
+             * https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
+             *
+             * @param node lowest element in DOM to start search for scrollable element.
+             * @return null if there are no scrollable elements; otherwise an element whose parent is scrollable.
+             */
+            function findFirstScrollableElement(node) {
+                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())
+                    || isNullOrUndefined(node.parent()[0])) {
+                    return null;
+                }
+
+                var parentNode = node.parent();
+
+                /*
+                 * check whether the height of the scrollable region on an element
+                 * is greater than the actual displayed region. This will tell us if
+                 * the element is scrollable
+                 */
+                if (parentNode[0].scrollHeight > parentNode[0].clientHeight) {
+                    return node;
+                } else {
+                    return findFirstScrollableElement(parentNode);
+                }
+            }
+
+            /**
+             * Scroll to a given element.
+             *
+             * This function assumes that the element is null (in which this function will do nothing)
+             * or an element whose parent is a scrollable region. To find this node, use
+             * findFirstScrollableElement.
+             *
+             * @param node Node at which to scroll to
+             */
+            function scrollToElement(node) {
+                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())) {
+                    return;
+                }
+
+                /* cancel any ongoing animation interval */
+                stopScrollAnimation();
+
+                /* grab our parent */
+                var parent = node.parent()[0];
+
+                /* scroll such that the top of our element is in the middle of the scrollable region */
+                var scrollToLocation = Math.max(0, Math.min(
+                    parent.scrollHeight,
+                    node[0].offsetTop - (parent.clientHeight / 2)
+                ));
+
+                /* start moving at 30fps */
+                startScrollToAnimation(parent, scrollToLocation);
+            }
+
+            /**
+             * Keyboard controller.
+             *
+             * @param $scope scope of the keyboard.
+             */
+            function mdKeyboardController($scope) {
+                var $ctrl = this;
+
+                $ctrl.getKey = getKey;
+                $ctrl.getKeyClass = getKeyClass;
+                $ctrl.pressed = pressed;
+
+                $ctrl.layout = getKeyboardLayout($mdKeyboard.getCurrentLayout());
+                $ctrl.capsLocked = false;
+                $ctrl.caps = false;
+
+                initialize();
+
+                /**
+                 * Initialize keyboard directive.
+                 */
+                function initialize () {
+                    useKeyboardLayout(attrs.useKeyboard);
+
+                    /* register event to change keyboard layout in our controller if it is changed externally */
+                    $scope.$on('$mdKeyboardLayoutChanged', function ($event, layout) {
+                        $ctrl.layout = getKeyboardLayout(layout);
+                    });
+                }
+
+                /**
+                 * Get key CSS class.
+                 * This class is used per key and will tell CSS how to style the keyboard
+                 *
+                 * @param key key name
+                 * @returns {string} CSS class for styling
+                 */
+                function getKeyClass (key) {
                     var k = (key[0] || ' ').toLowerCase();
                     var keys = ['bksp', 'tab', 'caps', 'enter', 'shift', 'alt', 'altgr', 'altlk'];
 
-                    // space bar
-                    if (k == ' ') {
+                    if (k === ' ') {
+                        /* space bar */
                         k = 'space';
-                    }
-                    // special key
-                    else if (keys.indexOf(k) < 0) {
+                    } else if (keys.indexOf(k) < 0) {
+                        /* special key */
                         k = 'char';
-                    }
-                    // spacer helper element
-                    else if (k == 'spacer') {
+                    } else if (k === 'spacer') {
+                        /* spacer helper element */
                         return k;
                     }
 
                     return 'key-' + k;
-                };
+                }
 
-                var triggerKey = function($event, key) {
+                /**
+                 * Handle what happens when a key gets pressed.
+                 *
+                 * @param $event mousedown event for handling key presses
+                 * @param key key that is pressed
+                 */
+                function pressed ($event, key) {
                     $event.preventDefault();
 
                     switch (key) {
-                        case "Caps":
-                            $scope.capsLocked = !$scope.capsLocked;
-                            $scope.caps = false;
+                        case 'Caps':
+                            $ctrl.capsLocked = !$ctrl.capsLocked;
+                            $ctrl.caps = false;
                             break;
-
-                        case "Shift":
-                            $scope.caps = !$scope.caps;
+                        case 'Shift':
+                            $ctrl.caps = !$ctrl.caps;
                             break;
-
-                        case "Alt":
-                        case "AltGr":
-                        case "AltLk":
+                        case 'Alt':
+                        case 'AltGr':
+                        case 'AltLk':
                             // modify input, visualize
                             //self.VKI_modify(type);
                             break;
-
-                        case "Tab":
+                        case 'Tab':
 
                             // cycle through elements
                             // or insert \t tab
@@ -3563,27 +3923,25 @@ function useKeyboardDirective($mdKeyboard, $timeout, $interval, $animate, $rootS
                             //        var target = self.VKI_target, elems = target.form.elements;
                             //        self.VKI_close(false);
                             //        for (var z = 0, me = false, j = -1; z < elems.length; z++) {
-                            //            if (j == -1 && elems[z].getAttribute("VKI_attached")) j = z;
+                            //            if (j == -1 && elems[z].getAttribute('VKI_attached')) j = z;
                             //            if (me) {
                             //                if (self.VKI_activeTab == 1 && elems[z]) break;
-                            //                if (elems[z].getAttribute("VKI_attached")) break;
+                            //                if (elems[z].getAttribute('VKI_attached')) break;
                             //            } else if (elems[z] == target) me = true;
                             //        }
                             //        if (z == elems.length) z = Math.max(j, 0);
-                            //        if (elems[z].getAttribute("VKI_attached")) {
+                            //        if (elems[z].getAttribute('VKI_attached')) {
                             //            self.VKI_show(elems[z]);
                             //        } else elems[z].focus();
                             //    } else self.VKI_target.focus();
-                            //} else self.VKI_insert("\t");
+                            //} else self.VKI_insert('\t');
                             //return false;
 
-                            $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '') + "\t");
+                            $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '') + '\t');
                             $mdKeyboard.currentModel.$validate();
                             $mdKeyboard.currentModel.$render();
-
                             break;
-
-                        case "Bksp":
+                        case 'Bksp':
 
                             // backspace
                             //self.VKI_target.focus();
@@ -3599,10 +3957,10 @@ function useKeyboardDirective($mdKeyboard, $timeout, $interval, $animate, $rootS
                             //        self.VKI_target.range = document.selection.createRange();
                             //    }
                             //    if (!self.VKI_target.range.text.length) self.VKI_target.range.moveStart('character', -1);
-                            //    self.VKI_target.range.text = "";
+                            //    self.VKI_target.range.text = '';
                             //} else self.VKI_target.value = self.VKI_target.value.substr(0, self.VKI_target.value.length - 1);
-                            //if (self.VKI_shift) self.VKI_modify("Shift");
-                            //if (self.VKI_altgr) self.VKI_modify("AltGr");
+                            //if (self.VKI_shift) self.VKI_modify('Shift');
+                            //if (self.VKI_altgr) self.VKI_modify('AltGr');
                             //self.VKI_target.focus();
                             //self.keyInputCallback();
                             //return true;
@@ -3610,154 +3968,54 @@ function useKeyboardDirective($mdKeyboard, $timeout, $interval, $animate, $rootS
                             $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '').slice(0, -1));
                             $mdKeyboard.currentModel.$validate();
                             $mdKeyboard.currentModel.$render();
-
                             break;
-
-                        case "Enter":
-                            if (element[0].nodeName.toUpperCase() != 'TEXTAREA') {
+                        case 'Enter':
+                            if (element[0].nodeName.toUpperCase() !== 'TEXTAREA') {
                                 $timeout(function () {
                                     angular.element(element[0].form).triggerHandler('submit');
                                 });
                             } else {
-                                $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '') + "\n");
+                                $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '') + '\n');
                                 $mdKeyboard.currentModel.$validate();
                                 $mdKeyboard.currentModel.$render();
                             }
-
                             break;
-
                         default:
-                            $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '') + key[0]);
+                            $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '') + $ctrl.getKey(key));
                             $mdKeyboard.currentModel.$validate();
                             $mdKeyboard.currentModel.$render();
-
-                            $scope.caps = false;
+                            $ctrl.caps = false;
+                            break;
                     }
-                };
-
-                var _init = function () {
-                    $scope.resolve = function () {
-                        $mdKeyboard.hide('ok');
-                    };
-                    $scope.getKeyClass = getKeyClass;
-                    $scope.keyboard = $mdKeyboard.getLayout($mdKeyboard.getCurrentLayout());
-                    $scope.pressed = triggerKey;
-
-                    $scope.$on('$mdKeyboardLayoutChanged', function ($event, layout) {
-                        $scope.keyboard = $mdKeyboard.getLayout(layout);
-                        $scope.$apply();
-                    });
-                };
-
-                _init();
-            }
-
-            function _getCaretPosition() {
-                if ('selectionStart' in element) {
-                    return element.selectionStart;
-                } else if (document.selection) {
-                    element.focus();
-                    var sel = document.selection.createRange();
-                    var selLen = document.selection.createRange().text.length;
-                    sel.moveStart('character', -element.value.length);
-                    return sel.text.length - selLen;
-                }
-            }
-
-            function hideKeyboard() {
-                if (!isNullOrUndefined(interval)) {
-                    $interval.cancel(interval);
                 }
 
-                if ($rootScope.keyboardTimeout) {
-                    $timeout.cancel($rootScope.keyboardTimeout);
-                }
-                $rootScope.keyboardTimeout = $timeout(function () {
-                    $rootScope.keyboardAnimation = $mdKeyboard.hide();
-                }, 100);
-            }
-
-            function isNullOrUndefined(variable) {
-                return (variable === null) || angular.isUndefined(variable);
-            }
-
-            /**
-             * Find the first node whose parent node is scrollable.
-             * If no parent node is scrollable, then
-             * null is returned. If the passed in node is null or undefined,
-             * the result will also be null.
-             * ----------------------
-             * function based off StackOverflow answer
-             * https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
-             *
-             * @param node  lowest element in DOM to start search for scrollable element
-             */
-            function findFirstScrollableElement(node) {
-                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())
-                    || isNullOrUndefined(node.parent()[0])) {
-                    return null;
-                }
-
-                var parentNode = node.parent();
-
-                /* check whether the height of the scrollable region on an element
-                 * is greater than the actual displayed region. This will tell us if
-                 * the element is scrollable */
-                if (parentNode[0].scrollHeight > parentNode[0].clientHeight) {
-                    return node;
-                } else {
-                    return findFirstScrollableElement(parentNode);
-                }
-            }
-
-            /**
-             * Scroll to a given element.
-             * This function assumes that the element is null (in which this function will do nothing)
-             * or an element whose parent is a scrollable region. To find this node, use
-             * findFirstScrollableElement.
-             *
-             * @param node  Node at which to scroll to
-             */
-            function scrollToElement(node) {
-                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())) {
-                    return;
-                }
-
-                /* cancel any ongoing animation interval */
-                if (!isNullOrUndefined(interval)) {
-                    $interval.cancel(interval);
-                }
-
-                /* grab our parent */
-                var parent = node.parent()[0];
-
-                /* scroll such that the top of our element is in the middle of the scrollable region */
-                var scrollToLocation = Math.max(0, Math.min(
-                    parent.scrollHeight,
-                    node[0].offsetTop - (parent.clientHeight / 2)
-                ));
-
-                /* keep track of our current location as a float (we cannot trust parent.scrollTop
-                 * because it is not a float and we will run into errors where scrolling may glitch)
+                /**
+                 * Get a keyboard layout based on name.
+                 *
+                 * @param layoutName name of the keyboard layout
+                 * @returns {*} keyboard layout
                  */
-                var currentLocation = parent.scrollTop;
+                function getKeyboardLayout (layoutName) {
+                    return $mdKeyboard.getLayout(layoutName);
+                }
 
-                /* start moving */
-                interval = $interval(moveStep, 10);
-                function moveStep() {
-                    var deltaScrollTo = scrollToLocation - currentLocation;
-
-                    /* 5px will not make that much of a difference */
-                    if (Math.abs(deltaScrollTo) <= 5) {
-                        $interval.cancel(interval);
-                    }
-
-                    currentLocation += deltaScrollTo * 0.15;
-                    parent.scrollTop = currentLocation;
+                /**
+                 * Get a key from a key list.
+                 *
+                 * @param key key list.
+                 * @param checkCaps should caps also be checked
+                 * @returns {*} the key from the key list
+                 */
+                function getKey (key, checkCaps) {
+                    /*
+                     * caps is based on both caps lock and cap (Shift) key
+                     * the function is actually XOR since we expect that if caps lock
+                     * is on and we press shift, a lowercase letter will be typed.
+                     * all other cases are obvious.
+                     */
+                    return (checkCaps && ($ctrl.capsLocked ^ $ctrl.caps)) ? key[1] : key[0];
                 }
             }
         }
     }
-}
-
-})(angular);
+})();

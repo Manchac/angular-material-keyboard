@@ -20,12 +20,10 @@ md-keyboard {
   right: 0;
   bottom: 0;
   z-index: 110;
-  border-top-width: 1px;
-  border-top-style: solid;
   opacity: 1;
   transform-origin: 50% 100%;
   background-color: #FAFAFA;
-  border-top-color: #E0E0E0; }
+  border-top: solid 1px #E0E0E0; }
   md-keyboard.md-has-header {
     padding-top: 0; }
   md-keyboard.fade.ng-enter {
