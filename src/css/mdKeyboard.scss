@@ -40,16 +40,12 @@ md-keyboard {
     right: 0;
     bottom: 0;
     z-index: $z-index-keyboard;
-
-    border-top-width: 1px;
-    border-top-style: solid;
-
     opacity: 1;
     transform-origin: 50% 100%;
 
     // should be provided by theme
     background-color: #FAFAFA;
-    border-top-color: #E0E0E0;
+    border-top: solid 1px #E0E0E0;
 
     &.md-has-header {
         padding-top: 0;
@@ -122,15 +118,18 @@ md-keyboard {
         &:not(.key-char) {
             width: auto;
         }
+
         &.key-bksp,
         &.key-caps {
             min-width: 15%;
         }
+
         &.key-tab,
         &.key-shift,
         &.key-enter {
             min-width: 10%;
         }
+
         &.key-space {
             text-align: center;
 
