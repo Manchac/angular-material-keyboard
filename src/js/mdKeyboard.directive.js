@@ -270,7 +270,8 @@ function useKeyboardDirective($mdKeyboard, $timeout, $interval, $animate, $rootS
              * @param node  lowest element in DOM to start search for scrollable element
              */
             function findFirstScrollableElement(node) {
-                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())) {
+                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())
+                    || isNullOrUndefined(node.parent()[0])) {
                     return null;
                 }
 
