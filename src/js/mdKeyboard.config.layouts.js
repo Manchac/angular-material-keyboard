@@ -44,9 +44,13 @@
  *
  */
 
-angular
-    .module('material.components.keyboard')
-    .constant('keyboardLayouts', (function () {
+(function () {
+    "use strict";
+
+    angular.module('material.components.keyboard')
+        .constant('keyboardLayouts', keyboardLayouts());
+
+    function keyboardLayouts () {
         var layouts = {
             '\u0627\u0644\u0639\u0631\u0628\u064a\u0629': {
                 'name': 'Arabic', 'keys': [
@@ -2735,4 +2739,5 @@ angular
         };
 
         return layouts;
-    })());
+    }
+})();

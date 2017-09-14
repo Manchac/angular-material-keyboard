@@ -1,5 +1,3 @@
-'use strict';
-
 /* See http://www.greywyvern.com/code/javascript/keyboard for examples
  * and usage instructions.
  *
@@ -46,8 +44,11 @@
  *
  */
 
-angular
-    .module('material.components.keyboard', [
+(function () {
+    "use strict";
+
+    angular.module('material.components.keyboard', [
         'material.core',
         'material.components.icon'
     ]);
+})();

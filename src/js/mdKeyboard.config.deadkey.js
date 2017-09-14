@@ -1,17 +1,22 @@
-// - Lay out each dead key set as an object of property/value
-//   pairs.  The rows below are wrapped so uppercase letters are
-//   below their lowercase equivalents.
-//
-// - The property name is the letter pressed after the diacritic.
-//   The property value is the letter this key-combo will generate.
-//
-// - Note that if you have created a new keyboard layout and want
-//   it included in the distributed script, PLEASE TELL ME if you
-//   have added additional dead keys to the ones below.
+/* - Lay out each dead key set as an object of property/value
+ *   pairs.  The rows below are wrapped so uppercase letters are
+ *   below their lowercase equivalents.
+ *
+ * - The property name is the letter pressed after the diacritic.
+ *   The property value is the letter this key-combo will generate.
+ *
+ * - Note that if you have created a new keyboard layout and want
+ *   it included in the distributed script, PLEASE TELL ME if you
+ *   have added additional dead keys to the ones below.
+ */
 
-angular
-    .module('material.components.keyboard')
-    .constant('keyboardDeadkey', (function () {
+(function () {
+    "use strict";
+
+    angular.module('material.components.keyboard')
+        .constant('keyboardDeadkey', keyboardDeadkey());
+
+    function keyboardDeadkey() {
         var deadkey = {
             '"': {
                 'a': '\u00e4',
@@ -79,15 +84,18 @@ angular
                 '\u30d8': '\u30d9',
                 '\u30db': '\u30dc'
             },
-            '~': { // Tilde / Stroke
+            // Tilde / Stroke
+            '~': {
                 'a': '\u00e3', 'l': '\u0142', 'n': '\u00f1', 'o': '\u00f5',
                 'A': '\u00c3', 'L': '\u0141', 'N': '\u00d1', 'O': '\u00d5'
             },
-            '^': { // Circumflex
+            // Circumflex
+            '^': {
                 'a': '\u00e2', 'e': '\u00ea', 'i': '\u00ee', 'o': '\u00f4', 'u': '\u00fb', 'w': '\u0175', 'y': '\u0177',
                 'A': '\u00c2', 'E': '\u00ca', 'I': '\u00ce', 'O': '\u00d4', 'U': '\u00db', 'W': '\u0174', 'Y': '\u0176'
             },
-            '\u02c7': { // Baltic caron
+            // Baltic caron
+            '\u02c7': {
                 'c': '\u010D',
                 'd': '\u010f',
                 'e': '\u011b',
@@ -111,11 +119,13 @@ angular
                 'Z': '\u017D',
                 '\u00dc': '\u01d9'
             },
-            '\u02d8': { // Romanian and Turkish breve
+            // Romanian and Turkish breve
+            '\u02d8': {
                 'a': '\u0103', 'g': '\u011f',
                 'A': '\u0102', 'G': '\u011e'
             },
-            '-': { // Macron
+            // Macron
+            '-': {
                 'a': '\u0101',
                 'e': '\u0113',
                 'i': '\u012b',
@@ -131,11 +141,13 @@ angular
                 'Y': '\u0232',
                 '\u00dc': '\u01d5'
             },
-            '`': { // Grave
+            // Grave
+            '`': {
                 'a': '\u00e0', 'e': '\u00e8', 'i': '\u00ec', 'o': '\u00f2', 'u': '\u00f9', '\u00fc': '\u01dc',
                 'A': '\u00c0', 'E': '\u00c8', 'I': '\u00cc', 'O': '\u00d2', 'U': '\u00d9', '\u00dc': '\u01db'
             },
-            '\'': { // Acute / Greek Tonos
+            // Acute / Greek Tonos
+            '\'': {
                 'a': '\u00e1',
                 'e': '\u00e9',
                 'i': '\u00ed',
@@ -165,41 +177,52 @@ angular
                 '\u03a9': '\u038f',
                 '\u00dc': '\u01d7'
             },
-            '\u02dd': {// Hungarian Double Acute Accent
+            // Hungarian Double Acute Accent
+            '\u02dd': {
                 'o': '\u0151', 'u': '\u0171',
                 'O': '\u0150', 'U': '\u0170'
             },
-            '\u0385': { // Greek Dialytika + Tonos
+            // Greek Dialytika + Tonos
+            '\u0385': {
                 '\u03b9': '\u0390', '\u03c5': '\u03b0'
             },
-            '\u00b0': { // Ring
+            // Ring
+            '\u00b0': {
                 'a': '\u00e5', 'u': '\u016f',
                 'A': '\u00c5', 'U': '\u016e'
             },
-            '\u02DB': { // Ogonek
+            // Ogonek
+            '\u02DB': {
                 'a': '\u0106', 'e': '\u0119', 'i': '\u012f', 'o': '\u01eb', 'u': '\u0173', 'y': '\u0177',
                 'A': '\u0105', 'E': '\u0118', 'I': '\u012e', 'O': '\u01ea', 'U': '\u0172', 'Y': '\u0176'
             },
-            '\u02D9': { // Dot-above
+            // Dot-above
+            '\u02D9': {
                 'c': '\u010B', 'e': '\u0117', 'g': '\u0121', 'z': '\u017C',
                 'C': '\u010A', 'E': '\u0116', 'G': '\u0120', 'Z': '\u017B'
             },
-            '\u00B8':  { // Cedilla
+            // Cedilla
+            '\u00B8':  {
                 'c': '\u00e7', 's': '\u015F',
                 'C': '\u00c7', 'S': '\u015E'
             },
-            /*',': { // Comma
+            /*// / Comma
+            ',': {
              's': (this.VKI_isIElt8) ? '\u015F' : '\u0219', 't': (this.VKI_isIElt8) ? '\u0163' : '\u021B',
              'S': (this.VKI_isIElt8) ? '\u015E' : '\u0218', 'T': (this.VKI_isIElt8) ? '\u0162' : '\u021A'
              },*/
-            '\u3002': { // Hiragana/Katakana Point
+            // Hiragana/Katakana Point
+            '\u3002': {
                 '\u306f': '\u3071', '\u3072': '\u3074', '\u3075': '\u3077', '\u3078': '\u307a', '\u307b': '\u307d',
                 '\u30cf': '\u30d1', '\u30d2': '\u30d4', '\u30d5': '\u30d7', '\u30d8': '\u30da', '\u30db': '\u30dd'
             }
         };
 
-        // aliases
+        buildAliases(deadkey);
+        return deadkey;
+    }
 
+    function buildAliases (deadkey) {
         // Macron
         deadkey['\u00af'] = deadkey['-'];
 
@@ -212,6 +235,5 @@ angular
         // Ring
         deadkey['\u00ba'] = deadkey['\u00b0'];
         deadkey['\u201a'] = deadkey['\u00B8'];
-
-        return deadkey;
-    })());
+    }
+})();
