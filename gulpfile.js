@@ -85,9 +85,7 @@ gulp.task('build', function () {
             .pipe(plugins.sass().on('error', plugins.sass.logError))
             .pipe(gulp.dest('./dist/'))
             .pipe(plugins.concat('mdKeyboard.min.css'))
-            .pipe(plugins.sourcemaps.init())
             .pipe(plugins.cleanCss())
-            .pipe(plugins.sourcemaps.write())
             .pipe(gulp.dest('./dist/'));
     }
 });
