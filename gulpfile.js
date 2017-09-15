@@ -68,6 +68,8 @@ gulp.task('build', function () {
                 'src/js/mdKeyboard.config.symbols.js',
                 'src/js/mdKeyboard.decorator.js',
                 'src/js/mdKeyboard.provider.js',
+                'src/js/mdKeyboardUtil.service.js',
+                'src/js/mdKeyboard.service.js',
                 'src/js/mdKeyboard.directive.js'
             ])
             .pipe(plugins.concat('mdKeyboard.js'))
