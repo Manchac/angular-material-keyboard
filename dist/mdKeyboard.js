@@ -3538,303 +3538,287 @@
 })();
 
 (function () {
-    "use strict";
-
-    MdKeyboardDirective.$inject = ["$mdKeyboard"];
-    useKeyboardDirective.$inject = ["$mdKeyboard", "$timeout", "$interval", "$animate", "$rootScope"];
     angular.module('material.components.keyboard')
-        .directive('mdKeyboard', MdKeyboardDirective)
-        .directive('useKeyboard', useKeyboardDirective);
+        .factory('mdKeyboardUtilService', mdKeyboardUtilService);
 
-    function MdKeyboardDirective ($mdKeyboard) {
+    function mdKeyboardUtilService () {
         return {
-            restrict: 'E',
-            link: postLink
+            isNullOrUndefined: isNullOrUndefined,
+            isMobileDevice: isMobileDevice
         };
 
-        function postLink (scope) {
-            // When navigation force destroys an interimElement, then
-            // listen and $destroy() that interim instance...
-            scope.$on('$destroy', function () {
-                $mdKeyboard.destroy();
-            });
+        /**
+         * Decide whether or not a value is null or undefined or neither.
+         *
+         * @param value value to check for null or undefined.
+         * @returns {boolean} true if element is null or undefined, false otherwise.
+         */
+        function isNullOrUndefined (value) {
+            return (value === null) || angular.isUndefined(value);
+        }
+
+        /**
+         * Detect if the device being used is a mobile device or other device.
+         *
+         * This function is based on the answer by Tiesselune on StackOverflow:
+         * https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
+         *
+         * @return Whether or not the current device is a mobile device.
+         */
+        function isMobileDevice () {
+            var a = navigator.userAgent || navigator.vendor || window.opera;
+
+            return /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)
+                || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br[ev]w|bumb|bw-[nu]|c55\/|capi|ccwa|cdm-|cell|chtm|cldc|cmd-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc-s|devi|dica|dmob|do[cp]o|ds(12|-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly[-_]|g1 u|g560|gene|gf-5|g-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd-[mpt]|hei-|hi(pt|ta)|hp( i|ip)|hs-c|ht(c[-_agpst ]|tp)|hu(aw|tc)|i-(20|go|ma)|i230|iac[\-\/ ]|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja[tv]a|jbro|jemu|jigs|kddi|keji|kgt[\/ ]|klon|kpt |kwc-|kyo[ck]|le(no|xi)|lg( g|\/[klu]|50|54|-[a-w])|libw|lynx|m1-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t[-ov ]|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30[02]|n50[025]|n7(0[01]|10)|ne([cm]-|on|tf|wf|wg|wt)|nok[6i]|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan[adt]|pdxg|pg(13|-([1-8]|c))|phil|pire|pl(ay|uc)|pn-2|po(ck|rt|se)|prox|psio|pt-g|qa-a|qc(07|12|21|32|60|-[2-7]|i-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h-|oo|p-)|sdk\/|se(c[-01]|47|mc|nd|ri)|sgh-|shar|sie[-m]|sk-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h-|v-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl-|tdg-|tel[im]|tim-|t-mo|to(pl|sh)|ts(70|m-|m3|m5)|tx-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c[- ]|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas-|your|zeto|zte-/i.test(a.substr(0, 4));
         }
     }
+})();
 
-    function useKeyboardDirective($mdKeyboard, $timeout, $interval, $animate, $rootScope) {
+(function () {
+    "use strict";
+
+    mdKeyboardService.$inject = ["$mdKeyboard", "$timeout", "$interval", "$animate", "mdKeyboardUtilService"];
+    angular.module('material.components.keyboard')
+        .factory('mdKeyboardService', mdKeyboardService);
+
+    function mdKeyboardService ($mdKeyboard, $timeout, $interval, $animate, mdKeyboardUtilService) {
+        var scrollAnimation = null;
+        var keyboardTimeout = null;
+        var keyboardAnimation = null;
+
         return {
-            restrict: 'A',
-            require: '?ngModel',
-            link: postLink
+            showKeyboard: showKeyboard,
+            hideKeyboard: hideKeyboard
         };
 
-        function postLink (scope, element, attrs, ngModelCtrl) {
-            /* Don't show virtual keyboard in mobile devices (default) */
-            var isMobile = isMobileDevice();
+        /**
+         * Show the keyboard.
+         */
+        function showKeyboard(element, attrs, ngModelCtrl) {
+            /* cancel all ongoing animations */
+            stopAllAnimations();
 
-            /* for show and hide */
-            $rootScope.keyboardTimeout = null;
-            $rootScope.keyboardAnimation = null;
-            $rootScope.scrollAnimation = null;
-
-            /* requires ngModel silently */
-            if (!ngModelCtrl) {
-                return;
-            }
-
-            /* do nothing if we are not supposed to show in mobile */
-            if (isMobile && attrs.showInMobile !== true) {
-                return;
+            /*
+             * decide whether to add a new keyboard or use
+             * existing based on whether or not the keyboard
+             * is already visible
+             */
+            if (!$mdKeyboard.isVisible()) {
+                /* no keyboard active, so add new */
+                $mdKeyboard.currentModel = ngModelCtrl;
+                startKeyboardShow(element, attrs);
+            } else {
+                /* use existing keyboard */
+                $mdKeyboard.currentModel = ngModelCtrl;
+                useKeyboardLayout(attrs.useKeyboard);
             }
 
             /*
-             * open keyboard on focus
-             * hide keyboard on blur and $destroy
+             * scroll to the element we just clicked on.
+             * this assumes a sane scrollable region. Multiple
+             * scrollable regions within each other are not supported
+             * at this moment
              */
-            element
-                .bind('focus', showKeyboard)
-                .bind('blur', hideKeyboard)
-                .bind('$destroy', hideKeyboard);
+            /* TODO: support multiple nested scrollable regions */
+            $timeout(function () {
+                scrollToElement(findFirstScrollableElement(element));
+            }, 0);
+        }
 
-            /**
-             * Detect if the device being used is a mobile device or other device.
-             *
-             * This function is based on the answer by Tiesselune on StackOverflow:
-             * https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
-             *
-             * @return Whether or not the current device is a mobile device.
-             */
-            function isMobileDevice () {
-                var a = navigator.userAgent || navigator.vendor || window.opera;
+        /**
+         * Hide the keyboard.
+         */
+        function hideKeyboard() {
+            /* stop all ongoing animations */
+            stopAllAnimations();
 
-                return /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series[46]0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)
-                    || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br[ev]w|bumb|bw-[nu]|c55\/|capi|ccwa|cdm-|cell|chtm|cldc|cmd-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc-s|devi|dica|dmob|do[cp]o|ds(12|-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly[-_]|g1 u|g560|gene|gf-5|g-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd-[mpt]|hei-|hi(pt|ta)|hp( i|ip)|hs-c|ht(c[-_agpst ]|tp)|hu(aw|tc)|i-(20|go|ma)|i230|iac[\-\/ ]|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja[tv]a|jbro|jemu|jigs|kddi|keji|kgt[\/ ]|klon|kpt |kwc-|kyo[ck]|le(no|xi)|lg( g|\/[klu]|50|54|-[a-w])|libw|lynx|m1-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t[-ov ]|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30[02]|n50[025]|n7(0[01]|10)|ne([cm]-|on|tf|wf|wg|wt)|nok[6i]|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan[adt]|pdxg|pg(13|-([1-8]|c))|phil|pire|pl(ay|uc)|pn-2|po(ck|rt|se)|prox|psio|pt-g|qa-a|qc(07|12|21|32|60|-[2-7]|i-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h-|oo|p-)|sdk\/|se(c[-01]|47|mc|nd|ri)|sgh-|shar|sie[-m]|sk-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h-|v-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl-|tdg-|tel[im]|tim-|t-mo|to(pl|sh)|ts(70|m-|m3|m5)|tx-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c[- ]|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas-|your|zeto|zte-/i.test(a.substr(0, 4));
+            /* keyboard hide timeout */
+            startKeyboardHide();
+        }
+
+        /**
+         * Set keyboard layout to use.
+         *
+         * @param layoutName layout name to use.
+         */
+        function useKeyboardLayout (layoutName) {
+            /* only use the keyboard if it is defined */
+            if (!mdKeyboardUtilService.isNullOrUndefined(layoutName) && layoutName !== '') {
+                /* switch which layout to use */
+                $mdKeyboard.useLayout(layoutName);
+            }
+        }
+
+        /**
+         * Find the first node whose parent node is scrollable.
+         *
+         * If no parent node is scrollable, then
+         * null is returned. If the passed in node is null or undefined,
+         * the result will also be null.
+         *
+         * function based off answer by nils on StackOverflow
+         * https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
+         *
+         * @param node lowest element in DOM to start search for scrollable element.
+         * @return null if there are no scrollable elements; otherwise an element whose parent is scrollable.
+         */
+        function findFirstScrollableElement(node) {
+            if (mdKeyboardUtilService.isNullOrUndefined(node)
+                || mdKeyboardUtilService.isNullOrUndefined(node.parent())
+                || mdKeyboardUtilService.isNullOrUndefined(node.parent()[0])) {
+                return null;
             }
 
-            /**
-             * Stop all ongoing animations that could possibly be occurring.
+            var parentNode = node.parent();
+
+            /*
+             * check whether the height of the scrollable region on an element
+             * is greater than the actual displayed region. This will tell us if
+             * the element is scrollable
              */
-            function stopAllAnimations () {
-                stopScrollAnimation();
-                stopKeyboardTimeout();
-                stopKeyboardAnimation();
+            if (parentNode[0].scrollHeight > parentNode[0].clientHeight) {
+                return node;
+            } else {
+                return findFirstScrollableElement(parentNode);
+            }
+        }
+
+        /**
+         * Scroll to a given element.
+         *
+         * This function assumes that the element is null (in which this function will do nothing)
+         * or an element whose parent is a scrollable region. To find this node, use
+         * findFirstScrollableElement.
+         *
+         * @param node Node at which to scroll to
+         */
+        function scrollToElement(node) {
+            if (mdKeyboardUtilService.isNullOrUndefined(node)
+                || mdKeyboardUtilService.isNullOrUndefined(node.parent())) {
+                return;
             }
 
-            /**
-             * Stop scroll to element animation.
-             */
-            function stopScrollAnimation () {
-                /* stop scroll animation */
-                if (!isNullOrUndefined($rootScope.scrollAnimation)) {
-                    $interval.cancel($rootScope.scrollAnimation);
-                    $rootScope.scrollAnimation = null;
-                }
+            /* cancel any ongoing animation interval */
+            stopScrollAnimation();
+
+            /* grab our parent */
+            var parent = node.parent()[0];
+
+            /* scroll such that the top of our element is in the middle of the scrollable region */
+            var scrollToLocation = Math.max(0, Math.min(
+                parent.scrollHeight,
+                node[0].offsetTop - (parent.clientHeight / 2)
+            ));
+
+            /* start scrolling */
+            startScrollToAnimation(parent, scrollToLocation);
+        }
+
+        /**
+         * Stop all ongoing animations that could possibly be occurring.
+         */
+        function stopAllAnimations () {
+            stopScrollAnimation();
+            stopKeyboardTimeout();
+            stopKeyboardAnimation();
+        }
+
+        /**
+         * Stop scroll to element animation.
+         */
+        function stopScrollAnimation () {
+            /* stop scroll animation */
+            if (!mdKeyboardUtilService.isNullOrUndefined(scrollAnimation)) {
+                $interval.cancel(scrollAnimation);
+                scrollAnimation = null;
             }
+        }
 
-            /**
-             * Stop keyboard hide timeout.
-             */
-            function stopKeyboardTimeout () {
-                /* stop keyboard timeout */
-                if (!isNullOrUndefined($rootScope.keyboardTimeout)) {
-                    $timeout.cancel($rootScope.keyboardTimeout);
-                    $rootScope.keyboardTimeout = null;
-                }
+        /**
+         * Stop keyboard hide timeout.
+         */
+        function stopKeyboardTimeout () {
+            /* stop keyboard timeout */
+            if (!mdKeyboardUtilService.isNullOrUndefined(keyboardTimeout)) {
+                $timeout.cancel(keyboardTimeout);
+                keyboardTimeout = null;
             }
+        }
 
-            /**
-             * Stop keyboard show or hide animation.
-             */
-            function stopKeyboardAnimation () {
-                /* stop keyboard animation */
-                if (!isNullOrUndefined($rootScope.keyboardAnimation)) {
-                    $animate.cancel($rootScope.keyboardAnimation);
-                    $rootScope.keyboardAnimation = null;
-                }
+        /**
+         * Stop keyboard show or hide animation.
+         */
+        function stopKeyboardAnimation () {
+            /* stop keyboard animation */
+            if (!mdKeyboardUtilService.isNullOrUndefined(keyboardAnimation)) {
+                $animate.cancel(keyboardAnimation);
+                keyboardAnimation = null;
             }
+        }
+
+        /**
+         * Start keyboard show animation.
+         */
+        function startKeyboardShow (element, attrs) {
+            keyboardAnimation = $mdKeyboard.show({
+                template:'<md-keyboard class="md-grid fade" layout="column" ng-cloak><div ng-repeat="row in keyboard.layout.keys" layout="row"><div flex ng-repeat="key in row" ng-switch="key[0]" ng-class="keyboard.getKeyClass(key)"><span ng-switch-when="Bksp"><md-button class="md-raised key-bksp" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_backspace</md-icon></md-button></span> <span ng-switch-when="Tab"><md-button class="md-raised key-tab" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_tab</md-icon></md-button></span> <span ng-switch-when="Caps"><md-button class="md-raised key-caps" ng-class="{\'locked\': keyboard.capsLocked, \'md-focused\': keyboard.capsLocked}" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_capslock</md-icon></md-button></span> <span ng-switch-when="Enter"><md-button class="md-raised key-enter" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_return</md-icon></md-button></span> <span ng-switch-when="Shift"><md-button class="md-raised key-shift" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}">{{ keyboard.getKey(key) }}</md-button></span> <span ng-switch-when="Spacer"></span> <span ng-switch-default><md-button class="md-raised key-char" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key, true) || keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key, true) || \'key\' }}">{{ keyboard.getKey(key, true) || keyboard.getKey(key) }}</md-button></span></div></div></md-keyboard>',
+                controller: makeMdKeyboardController(element, attrs.useKeyboard),
+                controllerAs: 'keyboard',
+                bindToController: true
+            });
+        }
+
+        /**
+         * Start keyboard hide animation.
+         */
+        function startKeyboardHide () {
+            keyboardTimeout = $timeout(function () {
+                keyboardAnimation = $mdKeyboard.hide();
+            }, 100);
+        }
+
+        /**
+         * Start animating scrolling to an element.
+         *
+         * @param parent parent element to scroll
+         * @param scrollToLocation location to scroll to
+         */
+        function startScrollToAnimation (parent, scrollToLocation) {
+            /*
+             * keep track of our current location as a float (we cannot trust parent.scrollTop
+             * because it is not a float and we will run into errors where scrolling may glitch)
+             */
+            var currentLocation = parent.scrollTop;
+
+            /* start scrolling at 30fps */
+            scrollAnimation = $interval(moveStep, 33);
 
             /**
-             * Start keyboard show animation.
+             * Move another step closer to the scroll to location.
              */
-            function startKeyboardShow () {
-                $rootScope.keyboardAnimation = $mdKeyboard.show({
-                    template:'<md-keyboard class="md-grid fade" layout="column" ng-cloak><div ng-repeat="row in keyboard.layout.keys" layout="row"><div flex ng-repeat="key in row" ng-switch="key[0]" ng-class="keyboard.getKeyClass(key)"><span ng-switch-when="Bksp"><md-button class="md-raised key-bksp" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_backspace</md-icon></md-button></span> <span ng-switch-when="Tab"><md-button class="md-raised key-tab" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_tab</md-icon></md-button></span> <span ng-switch-when="Caps"><md-button class="md-raised key-caps" ng-class="{\'locked\': keyboard.capsLocked, \'md-focused\': keyboard.capsLocked}" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_capslock</md-icon></md-button></span> <span ng-switch-when="Enter"><md-button class="md-raised key-enter" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}"><md-icon>keyboard_return</md-icon></md-button></span> <span ng-switch-when="Shift"><md-button class="md-raised key-shift" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key) || \'key\' }}">{{ keyboard.getKey(key) }}</md-button></span> <span ng-switch-when="Spacer"></span> <span ng-switch-default><md-button class="md-raised key-char" ng-mousedown="keyboard.pressed($event, keyboard.getKey(key, true) || keyboard.getKey(key))" aria-label="{{ keyboard.getKey(key, true) || \'key\' }}">{{ keyboard.getKey(key, true) || keyboard.getKey(key) }}</md-button></span></div></div></md-keyboard>',
-                    controller: mdKeyboardController,
-                    controllerAs: 'keyboard',
-                    bindToController: true
-                });
-            }
+            function moveStep () {
+                var deltaScrollTo = scrollToLocation - currentLocation;
 
-            /**
-             * Start keyboard hide animation.
-             */
-            function startKeyboardHide () {
-                $rootScope.keyboardTimeout = $timeout(function () {
-                    $rootScope.keyboardAnimation = $mdKeyboard.hide();
-                }, 100);
-            }
-
-            /**
-             * Start animating scrolling to an element.
-             *
-             * @param parent parent element to scroll
-             * @param scrollToLocation location to scroll to
-             */
-            function startScrollToAnimation (parent, scrollToLocation) {
-                /*
-                 * keep track of our current location as a float (we cannot trust parent.scrollTop
-                 * because it is not a float and we will run into errors where scrolling may glitch)
-                 */
-                var currentLocation = parent.scrollTop;
-
-                $rootScope.scrollAnimation = $interval(moveStep, 33);
-
-                /**
-                 * Move another step closer to the scroll to location.
-                 */
-                function moveStep () {
-                    var deltaScrollTo = scrollToLocation - currentLocation;
-
-                    /* Threshold of 5px will not make that much of a difference */
-                    if (Math.abs(deltaScrollTo) <= 5) {
-                        stopScrollAnimation();
-                    }
-
-                    currentLocation += deltaScrollTo * 0.15;
-                    parent.scrollTop = currentLocation;
-                }
-            }
-
-            /**
-             * Set keyboard layout to use.
-             *
-             * @param layoutName layout name to use.
-             */
-            function useKeyboardLayout (layoutName) {
-                /* only use the keyboard if it is defined */
-                if (!isNullOrUndefined(layoutName) && layoutName !== '') {
-                    /* switch which layout to use */
-                    $mdKeyboard.useLayout(layoutName);
-                }
-            }
-
-            /**
-             * Show the keyboard.
-             */
-            function showKeyboard() {
-                /* cancel all ongoing animations */
-                stopAllAnimations();
-
-                /*
-                 * decide whether to add a new keyboard or use
-                 * existing based on whether or not the keyboard
-                 * is already visible
-                 */
-                if (!$mdKeyboard.isVisible()) {
-                    /* no keyboard active, so add new */
-                    $mdKeyboard.currentModel = ngModelCtrl;
-                    startKeyboardShow();
-                } else {
-                    /* use existing keyboard */
-                    $mdKeyboard.currentModel = ngModelCtrl;
-                    useKeyboardLayout(attrs.useKeyboard);
-                }
-
-                /*
-                 * scroll to the element we just clicked on.
-                 * this assumes a sane scrollable region. Multiple
-                 * scrollable regions within each other are not supported
-                 * at this moment
-                 */
-                /* TODO: support multiple nested scrollable regions */
-                $timeout(function () {
-                    scrollToElement(findFirstScrollableElement(element));
-                }, 0);
-            }
-
-            /**
-             * Hide the keyboard.
-             */
-            function hideKeyboard() {
-                /* stop all ongoing animations */
-                stopAllAnimations();
-
-                /* keyboard hide timeout */
-                startKeyboardHide();
-            }
-
-            /**
-             * Decide whether or not a value is null or undefined or neither.
-             *
-             * @param value value to check for null or undefined.
-             * @returns {boolean} true if element is null or undefined, false otherwise.
-             */
-            function isNullOrUndefined(value) {
-                return (value === null) || angular.isUndefined(value);
-            }
-
-            /**
-             * Find the first node whose parent node is scrollable.
-             *
-             * If no parent node is scrollable, then
-             * null is returned. If the passed in node is null or undefined,
-             * the result will also be null.
-             *
-             * function based off answer by nils on StackOverflow
-             * https://stackoverflow.com/questions/35939886/find-first-scrollable-parent
-             *
-             * @param node lowest element in DOM to start search for scrollable element.
-             * @return null if there are no scrollable elements; otherwise an element whose parent is scrollable.
-             */
-            function findFirstScrollableElement(node) {
-                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())
-                    || isNullOrUndefined(node.parent()[0])) {
-                    return null;
+                /* Threshold of 5px will not make that much of a difference */
+                if (Math.abs(deltaScrollTo) <= 5) {
+                    stopScrollAnimation();
                 }
 
-                var parentNode = node.parent();
-
-                /*
-                 * check whether the height of the scrollable region on an element
-                 * is greater than the actual displayed region. This will tell us if
-                 * the element is scrollable
-                 */
-                if (parentNode[0].scrollHeight > parentNode[0].clientHeight) {
-                    return node;
-                } else {
-                    return findFirstScrollableElement(parentNode);
-                }
+                currentLocation += deltaScrollTo * 0.15;
+                parent.scrollTop = currentLocation;
             }
+        }
 
-            /**
-             * Scroll to a given element.
-             *
-             * This function assumes that the element is null (in which this function will do nothing)
-             * or an element whose parent is a scrollable region. To find this node, use
-             * findFirstScrollableElement.
-             *
-             * @param node Node at which to scroll to
-             */
-            function scrollToElement(node) {
-                if (isNullOrUndefined(node) || isNullOrUndefined(node.parent())) {
-                    return;
-                }
+        /**
+         * Make a new keyboard controller.
+         *
+         * @param element element the controller is being applied to
+         * @param keyboardLayoutName keyboard layout name to use
+         */
+        function makeMdKeyboardController(element, keyboardLayoutName) {
 
-                /* cancel any ongoing animation interval */
-                stopScrollAnimation();
-
-                /* grab our parent */
-                var parent = node.parent()[0];
-
-                /* scroll such that the top of our element is in the middle of the scrollable region */
-                var scrollToLocation = Math.max(0, Math.min(
-                    parent.scrollHeight,
-                    node[0].offsetTop - (parent.clientHeight / 2)
-                ));
-
-                /* start moving at 30fps */
-                startScrollToAnimation(parent, scrollToLocation);
-            }
+            /* return a controller decorated with an element, attributes, and ngModelCtrl */
+            return mdKeyboardController;
 
             /**
              * Keyboard controller.
@@ -3858,7 +3842,7 @@
                  * Initialize keyboard directive.
                  */
                 function initialize () {
-                    useKeyboardLayout(attrs.useKeyboard);
+                    useKeyboardLayout(keyboardLayoutName);
 
                     /* register event to change keyboard layout in our controller if it is changed externally */
                     $scope.$on('$mdKeyboardLayoutChanged', function ($event, layout) {
@@ -4015,6 +3999,74 @@
                      */
                     return (checkCaps && ($ctrl.capsLocked ^ $ctrl.caps)) ? key[1] : key[0];
                 }
+            }
+        }
+    }
+})();
+
+(function () {
+    "use strict";
+
+    MdKeyboardDirective.$inject = ["$mdKeyboard"];
+    useKeyboardDirective.$inject = ["mdKeyboardService", "mdKeyboardUtilService"];
+    angular.module('material.components.keyboard')
+        .directive('mdKeyboard', MdKeyboardDirective)
+        .directive('useKeyboard', useKeyboardDirective);
+
+    function MdKeyboardDirective ($mdKeyboard) {
+        return {
+            restrict: 'E',
+            link: postLink
+        };
+
+        function postLink (scope) {
+            // When navigation force destroys an interimElement, then
+            // listen and $destroy() that interim instance...
+            scope.$on('$destroy', function () {
+                $mdKeyboard.destroy();
+            });
+        }
+    }
+
+    function useKeyboardDirective(mdKeyboardService, mdKeyboardUtilService) {
+        return {
+            restrict: 'A',
+            require: '?ngModel',
+            link: postLink
+        };
+
+        function postLink (scope, element, attrs, ngModelCtrl) {
+            /* requires ngModel silently */
+            if (!ngModelCtrl) {
+                return;
+            }
+
+            /* do nothing if we are not supposed to show in mobile */
+            if (mdKeyboardUtilService.isMobileDevice() && !attrs.showInMobile) {
+                return;
+            }
+
+            /*
+             * open keyboard on focus
+             * hide keyboard on blur and $destroy
+             */
+            element
+                .bind('focus', showKeyboard)
+                .bind('blur', hideKeyboard)
+                .bind('$destroy', hideKeyboard);
+
+            /**
+             * Wrapper around showing the keyboard with the directive's parameters.
+             */
+            function showKeyboard () {
+                mdKeyboardService.showKeyboard(element, attrs, ngModelCtrl);
+            }
+
+            /**
+             * Wrapper around hiding the keyboard.
+             */
+            function hideKeyboard () {
+                mdKeyboardService.hideKeyboard();
             }
         }
     }
