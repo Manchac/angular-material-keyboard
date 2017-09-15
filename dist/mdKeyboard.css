@@ -1,18 +1,22 @@
 @keyframes keyboard-enter {
-  from {
+  0% {
     opacity: 0;
-    transform: scaleY(0); }
-  to {
+    transform: translateY(100%); }
+  75% {
+    opacity: 0.25; }
+  100% {
     opacity: 1;
-    transform: scaleY(1); } }
+    transform: translateY(0); } }
 
 @keyframes keyboard-leave {
-  from {
+  0% {
     opacity: 1;
-    transform: scaleY(1); }
-  to {
+    transform: translateY(0); }
+  75% {
+    opacity: 0.75; }
+  100% {
     opacity: 0;
-    transform: scaleY(0); } }
+    transform: translateY(100%); } }
 
 md-keyboard {
   position: relative;
@@ -29,7 +33,7 @@ md-keyboard {
   md-keyboard.fade.ng-enter {
     animation: keyboard-enter 0.15s ease-in; }
   md-keyboard.fade.ng-leave {
-    animation: keyboard-leave 0.2s ease-in; }
+    animation: keyboard-leave 0.15s ease-in; }
   md-keyboard .md-subheader {
     background-color: transparent;
     font-family: Roboto, "Helvetica Neue", sans-serif;

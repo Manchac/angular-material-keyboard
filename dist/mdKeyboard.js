@@ -3790,8 +3790,8 @@
              */
             var currentLocation = parent.scrollTop;
 
-            /* start scrolling at 30fps */
-            scrollAnimation = $interval(moveStep, 33);
+            /* start scrolling */
+            scrollAnimation = $interval(moveStep, 25);
 
             /**
              * Move another step closer to the scroll to location.
@@ -3804,7 +3804,7 @@
                     stopScrollAnimation();
                 }
 
-                currentLocation += deltaScrollTo * 0.15;
+                currentLocation += deltaScrollTo * 0.3;
                 parent.scrollTop = currentLocation;
             }
         }
