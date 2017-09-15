@@ -1,7 +1,7 @@
 /**
  * angular-material-keyboard
  * Onscreen virtual keyboard for Angular (https://angularjs.org/) using Material (https://material.angularjs.org/) inspired by the Angular Virtual Keyboard by the-darc (https://github.com/the-darc/angular-virtual-keyboard).
- * @version v0.0.12
+ * @version v0.0.13
  * @author David Enke <postdavidenke.de>; Taylor Lanclos <tlanclos@live.com>
  * @link https://github.com/tlanclos/angular-material-keyboard
  * @license MIT
