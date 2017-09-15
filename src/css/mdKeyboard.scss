@@ -11,26 +11,34 @@ $keyboard-header-height: 7 * $baseline-grid !default;
 $keyboard-grid-font-weight: 400 !default;
 
 @keyframes keyboard-enter {
-    from {
+    0% {
         opacity: 0;
-        transform: scaleY(0);
+        transform: translateY(100%);
     }
 
-    to {
+    75% {
+        opacity: 0.25;
+    }
+
+    100% {
         opacity: 1;
-        transform: scaleY(1);
+        transform: translateY(0);
     }
 }
 
 @keyframes keyboard-leave {
-    from {
+    0% {
         opacity: 1;
-        transform: scaleY(1);
+        transform: translateY(0);
     }
 
-    to {
+    75% {
+        opacity: 0.75;
+    }
+
+    100% {
         opacity: 0;
-        transform: scaleY(0);
+        transform: translateY(100%);
     }
 }
 
@@ -56,7 +64,7 @@ md-keyboard {
     }
 
     &.fade.ng-leave {
-        animation: keyboard-leave 0.2s ease-in;
+        animation: keyboard-leave 0.15s ease-in;
     }
 
     .md-subheader {
