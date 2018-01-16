@@ -3204,7 +3204,7 @@
             return $delegate;
         }
     }
-});
+})();
 
 (function () {
     "use strict";
