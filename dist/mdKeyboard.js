@@ -3949,10 +3949,47 @@
                             //self.keyInputCallback();
                             //return true;
 
-                            $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '').slice(0, -1));
-                            $mdKeyboard.currentModel.$validate();
-                            $mdKeyboard.currentModel.$render();
-                            break;
+                            var selectionStart = element[0].selectionStart;
+                            var selectionEnd = element[0].selectionEnd;
+                            var curval = $mdKeyboard.currentModel.$viewValue || '';
+                            if (selectionStart === selectionEnd && selectionStart === 0) {
+                                /**
+                                 * if the selection start and end are the
+                                 * same, then we do not have anything highlighted
+                                 * and if selectionStart is 0, then we are at the
+                                 * beginning of the string so we do not do anything
+                                 **/
+                                $mdKeyboard.currentModel.$validate();
+                                $mdKeyboard.currentModel.$render();
+                                break;
+                            } else if (selectionStart === selectionEnd && selectionStart !== 0) {
+                                /**
+                                 * if the selection start and end are the
+                                 * same, then we do not have anything highlighted
+                                 * and if selectionStart is not 0, then we are removing
+                                 * something from within the string
+                                 */
+                                $mdKeyboard.currentModel.$setViewValue(
+                                    curval.slice(0, selectionStart - 1) + curval.slice(selectionEnd)
+                                );
+                                $mdKeyboard.currentModel.$validate();
+                                $mdKeyboard.currentModel.$render();
+                                element[0].setSelectionRange(selectionStart - 1, selectionStart - 1);
+                                break;
+                            } else {
+                                /**
+                                 * the selection start and end are not the same,
+                                 * but we can guarentee start << end since we know
+                                 * they are not equal.
+                                 */
+                                $mdKeyboard.currentModel.$setViewValue(
+                                    curval.slice(0, selectionStart) + curval.slice(selectionEnd)
+                                );
+                                $mdKeyboard.currentModel.$validate();
+                                $mdKeyboard.currentModel.$render();
+                                element[0].setSelectionRange(selectionStart, selectionStart);
+                                break;
+                            }
                         case 'Enter':
                             if (element[0].nodeName.toUpperCase() !== 'TEXTAREA') {
                                 $timeout(function () {
