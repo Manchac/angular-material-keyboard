@@ -3582,6 +3582,13 @@
         .factory('mdKeyboardService', mdKeyboardService);
 
     function mdKeyboardService ($mdKeyboard, $timeout, $interval, $animate, mdKeyboardUtilService) {
+        /**
+         * @typedef {Object} ViewSelection
+         * @property selectionStart new selection start.
+         * @property selectionEnd new selection end.
+         * @property viewValue new view value.
+         */
+
         var scrollAnimation = null;
         var keyboardTimeout = null;
         var keyboardAnimation = null;
@@ -3876,12 +3883,86 @@
                 }
 
                 /**
+                 * Remove the selected text from the text value supplied.
+                 * If selection start and end are the same, then remove the
+                 * character previous to the the start/end selection. If
+                 * selection start and end are not the same, then remove
+                 * the highlighted region.
+                 *
+                 * @param curval supplied text value.
+                 * @param selectionStart start of selection.
+                 * @param selectionEnd end of selection.
+                 * @returns {ViewSelection} new view value and selections.
+                 */
+                function removeSelection(curval, selectionStart, selectionEnd) {
+                    /* ensure the selection is ordered such that end >= start */
+                    if (selectionStart > selectionEnd) {
+                        var tmp = selectionStart;
+                        selectionStart = selectionEnd;
+                        selectionEnd = tmp;
+                    }
+
+                    if (selectionStart === selectionEnd) {
+                        /**
+                         * if the selection start and end are the
+                         * same, then we do not have anything highlighted
+                         * and we will be removing a single character
+                         */
+                        return {
+                            selectionStart: Math.max(0, selectionStart - 1),
+                            selectionEnd: Math.max(0, selectionStart - 1),
+                            viewValue: curval.slice(0, Math.max(0, selectionStart - 1)) + curval.slice(selectionEnd)
+                        };
+                    } else {
+                        /**
+                         * the selection start and end are not the same,
+                         * but we can guarentee start << end since we know
+                         * they are not equal. something is highlighted so
+                         * we will be removing this highlighted region.
+                         */
+                        return {
+                            selectionStart: selectionStart,
+                            selectionEnd: selectionStart,
+                            viewValue: curval.slice(0, selectionStart) + curval.slice(selectionEnd)
+                        };
+                    }
+                }
+
+                /**
+                 * Insert or replace the text at the current selection. If selection start
+                 * and end are the same, then a character will be added at the selected start/end
+                 * location. If selection start and end are not the same, then the highlighted region
+                 * will be replaced with the provided text.
+                 *
+                 * @param curval supplied text value.
+                 * @param selectionStart start of selection.
+                 * @param selectionEnd end of selection.
+                 * @param withText text to insert or replace with.
+                 * @returns {ViewSelection} new view value and selections.
+                 */
+                function insertOrReplaceSelection(curval, selectionStart, selectionEnd, withText) {
+                    /* ensure the selection is ordered such that end >= start */
+                    if (selectionStart > selectionEnd) {
+                        var tmp = selectionStart;
+                        selectionStart = selectionEnd;
+                        selectionEnd = tmp;
+                    }
+
+                    return {
+                        selectionStart: selectionStart + withText.length,
+                        selectionEnd: selectionStart + withText.length,
+                        viewValue: curval.slice(0, selectionStart) + withText + curval.slice(selectionEnd)
+                    };
+                }
+
+                /**
                  * Handle what happens when a key gets pressed.
                  *
                  * @param $event mousedown event for handling key presses
                  * @param key key that is pressed
                  */
                 function pressed ($event, key) {
+                    var ret;
                     $event.preventDefault();
 
                     switch (key) {
@@ -3948,48 +4029,16 @@
                             //self.VKI_target.focus();
                             //self.keyInputCallback();
                             //return true;
-
-                            var selectionStart = element[0].selectionStart;
-                            var selectionEnd = element[0].selectionEnd;
-                            var curval = $mdKeyboard.currentModel.$viewValue || '';
-                            if (selectionStart === selectionEnd && selectionStart === 0) {
-                                /**
-                                 * if the selection start and end are the
-                                 * same, then we do not have anything highlighted
-                                 * and if selectionStart is 0, then we are at the
-                                 * beginning of the string so we do not do anything
-                                 **/
-                                $mdKeyboard.currentModel.$validate();
-                                $mdKeyboard.currentModel.$render();
-                                break;
-                            } else if (selectionStart === selectionEnd && selectionStart !== 0) {
-                                /**
-                                 * if the selection start and end are the
-                                 * same, then we do not have anything highlighted
-                                 * and if selectionStart is not 0, then we are removing
-                                 * something from within the string
-                                 */
-                                $mdKeyboard.currentModel.$setViewValue(
-                                    curval.slice(0, selectionStart - 1) + curval.slice(selectionEnd)
-                                );
-                                $mdKeyboard.currentModel.$validate();
-                                $mdKeyboard.currentModel.$render();
-                                element[0].setSelectionRange(selectionStart - 1, selectionStart - 1);
-                                break;
-                            } else {
-                                /**
-                                 * the selection start and end are not the same,
-                                 * but we can guarentee start << end since we know
-                                 * they are not equal.
-                                 */
-                                $mdKeyboard.currentModel.$setViewValue(
-                                    curval.slice(0, selectionStart) + curval.slice(selectionEnd)
-                                );
-                                $mdKeyboard.currentModel.$validate();
-                                $mdKeyboard.currentModel.$render();
-                                element[0].setSelectionRange(selectionStart, selectionStart);
-                                break;
-                            }
+                            ret = removeSelection(
+                                $mdKeyboard.currentModel.$viewValue,
+                                element[0].selectionStart,
+                                element[0].selectionEnd
+                            );
+                            $mdKeyboard.currentModel.$setViewValue(ret.viewValue);
+                            $mdKeyboard.currentModel.$validate();
+                            $mdKeyboard.currentModel.$render();
+                            element[0].setSelectionRange(ret.selectionStart, ret.selectionEnd);
+                            break;
                         case 'Enter':
                             if (element[0].nodeName.toUpperCase() !== 'TEXTAREA') {
                                 $timeout(function () {
@@ -4002,9 +4051,16 @@
                             }
                             break;
                         default:
-                            $mdKeyboard.currentModel.$setViewValue(($mdKeyboard.currentModel.$viewValue || '') + $ctrl.getKey(key));
+                            ret = insertOrReplaceSelection(
+                                $mdKeyboard.currentModel.$viewValue,
+                                element[0].selectionStart,
+                                element[0].selectionEnd,
+                                $ctrl.getKey(key)
+                            );
+                            $mdKeyboard.currentModel.$setViewValue(ret.viewValue);
                             $mdKeyboard.currentModel.$validate();
                             $mdKeyboard.currentModel.$render();
+                            element[0].setSelectionRange(ret.selectionStart, ret.selectionEnd);
                             $ctrl.caps = false;
                             break;
                     }
