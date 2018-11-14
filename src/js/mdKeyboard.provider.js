@@ -11,6 +11,8 @@
         var currentKeyboardLayout = 'US International';
         var keyboardSelectorString = 'body';
         var isKeyboardVisible = false;
+        var showKeyboardOnFocus = true;
+
         var $mdKeyboard = $$interimElementProvider('$mdKeyboard')
             .setDefaults({
                 methods: ['themable', 'disableParentScroll', 'clickOutsideToClose', 'layout'],
@@ -19,6 +21,7 @@
             .addMethod('getLayout', getLayout)
             .addMethod('getCurrentLayout', getCurrentLayout)
             .addMethod('getLayouts', getLayouts)
+            .addMethod('showOnFocus', showOnFocus)
             .addMethod('defaultLayout', defaultLayout)
             .addMethod('keyboardSelector', keyboardSelector)
             .addMethod('useLayout', useLayout)
@@ -32,6 +35,7 @@
         $mdKeyboard.getLayout = getLayout;
         $mdKeyboard.getCurrentLayout = getCurrentLayout;
         $mdKeyboard.getLayouts = getLayouts;
+        $mdKeyboard.showOnFocus = showOnFocus;
         $mdKeyboard.defaultLayout = defaultLayout;
         $mdKeyboard.keyboardSelector = keyboardSelector;
         $mdKeyboard.useLayout = useLayout;
@@ -130,6 +134,19 @@
 
             /* broadcast new layout */
             broadcastNewLayout();
+        }
+
+        /**
+         * Set whether or not the keyboard is shown on input focus.
+         *
+         * @param autoShow true if keyboard should be shown on input focus, false if not.
+         */
+        function showOnFocus(autoShow) {
+            if (autoShow === undefined) {
+                return showKeyboardOnFocus;
+            } else {
+                showKeyboardOnFocus = autoShow;
+            }
         }
 
         /**
