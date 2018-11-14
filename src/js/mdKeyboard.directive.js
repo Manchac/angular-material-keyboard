@@ -20,7 +20,7 @@
         }
     }
 
-    function useKeyboardDirective(mdKeyboardService, mdKeyboardUtilService) {
+    function useKeyboardDirective($mdKeyboard, mdKeyboardService, mdKeyboardUtilService) {
         return {
             restrict: 'A',
             require: '?ngModel',
@@ -39,13 +39,17 @@
             }
 
             /*
-             * open keyboard on focus
              * hide keyboard on blur and $destroy
              */
+
             element
-                .bind('focus', showKeyboard)
                 .bind('blur', hideKeyboard)
                 .bind('$destroy', hideKeyboard);
+
+            if ($mdKeyboard.showOnFocus()) {
+                /* open keyboard on focus */
+                element.bind('focus', showKeyboard);
+            }
 
             /**
              * Wrapper around showing the keyboard with the directive's parameters.

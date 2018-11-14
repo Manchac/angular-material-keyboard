@@ -3221,6 +3221,8 @@
         var currentKeyboardLayout = 'US International';
         var keyboardSelectorString = 'body';
         var isKeyboardVisible = false;
+        var showKeyboardOnFocus = true;
+
         var $mdKeyboard = $$interimElementProvider('$mdKeyboard')
             .setDefaults({
                 methods: ['themable', 'disableParentScroll', 'clickOutsideToClose', 'layout'],
@@ -3229,6 +3231,7 @@
             .addMethod('getLayout', getLayout)
             .addMethod('getCurrentLayout', getCurrentLayout)
             .addMethod('getLayouts', getLayouts)
+            .addMethod('showOnFocus', showOnFocus)
             .addMethod('defaultLayout', defaultLayout)
             .addMethod('keyboardSelector', keyboardSelector)
             .addMethod('useLayout', useLayout)
@@ -3242,6 +3245,7 @@
         $mdKeyboard.getLayout = getLayout;
         $mdKeyboard.getCurrentLayout = getCurrentLayout;
         $mdKeyboard.getLayouts = getLayouts;
+        $mdKeyboard.showOnFocus = showOnFocus;
         $mdKeyboard.defaultLayout = defaultLayout;
         $mdKeyboard.keyboardSelector = keyboardSelector;
         $mdKeyboard.useLayout = useLayout;
@@ -3340,6 +3344,19 @@
 
             /* broadcast new layout */
             broadcastNewLayout();
+        }
+
+        /**
+         * Set whether or not the keyboard is shown on input focus.
+         *
+         * @param autoShow true if keyboard should be shown on input focus, false if not.
+         */
+        function showOnFocus(autoShow) {
+            if (autoShow === undefined) {
+                return showKeyboardOnFocus;
+            } else {
+                showKeyboardOnFocus = autoShow;
+            }
         }
 
         /**
@@ -4101,7 +4118,7 @@
     "use strict";
 
     MdKeyboardDirective.$inject = ["$mdKeyboard"];
-    useKeyboardDirective.$inject = ["mdKeyboardService", "mdKeyboardUtilService"];
+    useKeyboardDirective.$inject = ["$mdKeyboard", "mdKeyboardService", "mdKeyboardUtilService"];
     angular.module('material.components.keyboard')
         .directive('mdKeyboard', MdKeyboardDirective)
         .directive('useKeyboard', useKeyboardDirective);
@@ -4121,7 +4138,7 @@
         }
     }
 
-    function useKeyboardDirective(mdKeyboardService, mdKeyboardUtilService) {
+    function useKeyboardDirective($mdKeyboard, mdKeyboardService, mdKeyboardUtilService) {
         return {
             restrict: 'A',
             require: '?ngModel',
@@ -4140,13 +4157,17 @@
             }
 
             /*
-             * open keyboard on focus
              * hide keyboard on blur and $destroy
              */
+
             element
-                .bind('focus', showKeyboard)
                 .bind('blur', hideKeyboard)
                 .bind('$destroy', hideKeyboard);
+
+            if ($mdKeyboard.showOnFocus()) {
+                /* open keyboard on focus */
+                element.bind('focus', showKeyboard);
+            }
 
             /**
              * Wrapper around showing the keyboard with the directive's parameters.
